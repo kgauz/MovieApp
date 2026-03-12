@@ -116,23 +116,7 @@ export default function Login() {
           }}
         />
 
-        {/* Password */}
-        {/* <TextInput
-          value={password}
-          type="hidden"
-          onChangeText={setPassword}
-          placeholder="Password"
-          placeholderTextColor="#ccc"
-          secureTextEntry
-          style={{
-            height: 55,
-            padding: 15,
-            borderRadius: 15,
-            backgroundColor: "rgba(255,255,255,0.15)",
-            color: "#fff",
-            marginBottom: 10,
-          }}
-        /> */}
+     
         <View style={{ position: "relative", marginBottom: 10 }}>
       <TextInput
         value={password}
