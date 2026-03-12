@@ -5,7 +5,7 @@ export default async function saveUser(username , email, password , confirmPass)
       return { success: false, message: "Passwords do not match" };
     }
 
-    const res = await fetch("http://localhost:5000/register", {
+    const res = await fetch("https://movieapp-acny.onrender.com/register", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({
