@@ -13,7 +13,7 @@ export const deleteUser = async (router) => {
   }
 
   try {
-    const response = await fetch("http://localhost:5000/delete-account", {
+    const response = await fetch("https://movieapp-acny.onrender.com/delete-account", {
       method: "DELETE",
       headers: {
         "Content-Type": "application/json",
