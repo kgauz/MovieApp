@@ -12,7 +12,7 @@ import { auth } from "./middleware.js";
 dotenv.config();
 
 const app = express();
-
+const PORT = process.env.PORT || 5000;
 //  Use simple CORS for dev
 
 app.use(cors());
@@ -224,4 +224,4 @@ app.get("/save-movie", auth, async (req, res) => {
     res.status(500).json({ msg: "Server error" });
   }
 });
-app.listen(5000, () => console.log("Server running on port 5000"));
+app.listen(PORT, () => console.log("Server running on port ${PORT}"));
