@@ -1,6 +1,6 @@
 export default async function saveSearchToDB(movie) {
   try {
-    const res = await fetch("http://localhost:5000/search", {
+    const res = await fetch("https://movieapp-acny.onrender.com/search", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({
