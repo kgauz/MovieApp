@@ -150,7 +150,7 @@ useEffect(() => {
                     pathname: "/(tabs)/search",
                     params: { query: searchText.trim() },
                   });
-                  setSearchText("");
+                  //setSearchText("");
                 }}
                 placeholder="Search movies..."
                 placeholderTextColor="#94a3b8"
