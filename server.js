@@ -12,7 +12,7 @@ import { auth } from "./middleware.js";
 dotenv.config();
 
 const app = express();
-
+const PORT = process.env.PORT || 5000;
 //  Use simple CORS for dev
 
 app.use(cors());
@@ -224,26 +224,4 @@ app.get("/save-movie", auth, async (req, res) => {
     res.status(500).json({ msg: "Server error" });
   }
 });
-
-// app.post("/get-saved-movies", async (req, res) => {
-//   try {
-//     const { token } = req.body;
-
-//     if (!token) {
-//       return res.status(401).json({ msg: "Not logged in" });
-//     }
-
-//     const decoded = jwt.verify(token, process.env.JWT_SECRET);
-//     const userID = decoded.id;
-
-//     const savedMovies = await UserList.find({ userID });
-
-//     res.json({ savedMovies });
-
-//   } catch (error) {
-//     console.error(error);
-//     res.status(500).json({ msg: "Server error" });
-//   }
-// });
-
-app.listen(5000, () => console.log("Server running on port 5000"));
+app.listen(PORT, () => console.log("Server running on port ${PORT}"));

@@ -19,7 +19,7 @@ export default function SavedScreen() {
     const token = await AsyncStorage.getItem("token");
     if (!token) return;
     try {
-      const res = await fetch("http://localhost:5000/save-movie", {
+      const res = await fetch("https://movieapp-acny.onrender.com/save-movie", {
         method: "GET",
         headers: { Authorization: `Bearer ${token}` },
       });

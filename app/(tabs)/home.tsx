@@ -42,14 +42,14 @@ const cardWidth = (width - spacing * (columns + 1)) / columns;
 useEffect(() => {
   const getTrending = async () => {
     try {
-      const res = await fetch("http://localhost:5000/trending"); // your backend
+      const res = await fetch("https://movieapp-acny.onrender.com/trending"); 
       const data = await res.json();
 
       const mapped = data.map((m: any) => ({
         id: m.movieID,                  // TMDB expects id
         title: m.title,
         poster_path: m.poster_url,
-        backdrop_path: null,             // default if not available
+        backdrop_path: null,             
         adult: false,                    // default
         genre_ids: [],                   // default empty
         original_language: "en",
@@ -150,7 +150,7 @@ useEffect(() => {
                     pathname: "/(tabs)/search",
                     params: { query: searchText.trim() },
                   });
-                  setSearchText("");
+                  //setSearchText("");
                 }}
                 placeholder="Search movies..."
                 placeholderTextColor="#94a3b8"

@@ -25,7 +25,7 @@ export default function userAccount() {
       }
 
       try {
-        const response = await fetch("http://localhost:5000/profile", {
+        const response = await fetch("https://movieapp-acny.onrender.com/profile", {
           headers: {
             Authorization: token,
           },

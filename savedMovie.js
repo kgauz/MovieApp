@@ -8,7 +8,7 @@ export default async function saveMovie(movie) {
   }
 
   try {
-    const response = await fetch("http://localhost:5000/save-movie", {
+    const response = await fetch("https://movieapp-acny.onrender.com/save-movie", {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
