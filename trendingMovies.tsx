@@ -1,102 +1,67 @@
-import { Image, Text, View, useWindowDimensions, TouchableOpacity } from "react-native";
+import { Ionicons } from "@expo/vector-icons";
+import { Link } from "expo-router";
+import { Image, Text, TouchableOpacity, View, useWindowDimensions } from "react-native";
 import { Movie } from "./movie";
-import { useRouter } from "expo-router";
-import { ResizeMode } from "react-native-video";
-
-type MovieLoaderProps = Movie & {
-  index: number;
-};
-
-export default function TrendingMovies({
+export default function trendingMovies({
   id,
-  title,
   poster_path,
-  index,
-}: MovieLoaderProps) {
-
+  poster, 
+  title,
+  release_date,
+  vote_average =0,
+  movie_type,
+}: Movie & { poster?: string }) {
+  const imageURL =
+    poster ||
+    (poster_path ? `https://image.tmdb.org/t/p/w500${poster_path}` : null);
+  console.log(imageURL);
   const { width } = useWindowDimensions();
-  // const posterHeight = width > 600 ? 220 : 150;
- // const posterWidth =  "100%";
-  // const posterHeight = width * 0.4;
-   const posterWidth = width > 900 ? 160 : width > 600 ? 140 : 110;
-   const posterHeight = posterWidth * 1.5;
 
-  const router = useRouter();
+  const isTablet = width > 600;
 
   return (
-    <TouchableOpacity
-      style={{ width: "100%" }}
-      onPress={() => router.push(`/movies/${id}`)} // navigate on press
-    >
-      <View style={{ position: "relative" }}>
-
-        {poster_path ? (
+    <TouchableOpacity style={{ width: "100%" }}>
+      <Link
+        href={{
+          pathname: "/movies/[id]",
+          params: {
+            id: id,
+            type: movie_type,
+          },
+        }}
+      >
+        {" "}
+        {imageURL ? (
           <Image
             source={{
-              uri: `https://image.tmdb.org/t/p/w500${poster_path}`,
+              uri: imageURL,
             }}
-            style={{
-              width: posterWidth,
-              height: posterHeight,
-              borderRadius: 5,
-            }}
+            style={[
+              { width: "100%", borderRadius: 6 },
+              isTablet
+                ? { aspectRatio: 2 / 3 } // Tablet
+                : { height: 180 }, // Phone
+            ]}
             resizeMode="cover"
           />
         ) : (
           <View
-            style={{
-              width: posterWidth,
-              height: posterHeight,
-              backgroundColor: "#1f2933",
-              alignItems: "center",
-              justifyContent: "center",
-              borderRadius: 5,
-            }}
+            style={[
+              {
+                width: "100%",
+                backgroundColor: "#1f2933",
+                alignItems: "center",
+                justifyContent: "center",
+              },
+              isTablet
+                ? { aspectRatio: 2 / 3 } // Tablet
+                : { height: 170 },
+            ]}
           >
-            <Text style={{ color: "#9ca3af", fontSize: 12 }}>
-              No Image
-            </Text>
+            <Text style={{ color: "#9ca3af", fontSize: 12 }}>No Image</Text>
           </View>
         )}
-
-        {/* Ranking number */}
-        <View
-          style={{
-            position: "absolute",
-            bottom: 5,
-            left: 5,
-          }}
-        >
-          {/* White border */}
-          <Text
-            style={{
-              position: "absolute",
-              fontSize: 30,
-              fontWeight: "bold",
-              color: "white",
-              textShadowColor: "white",
-              textShadowOffset: { width: 0, height: 0 },
-              textShadowRadius: 6,
-            }}
-          >
-            {index + 1}
-          </Text>
-
-          {/* Black number */}
-          <Text
-            style={{
-              fontSize: 30,
-              fontWeight: "bold",
-              color: "black",
-            }}
-          >
-            {index + 1}
-          </Text>
-        </View>
-
-      </View>
-
-      {/* Movie title */}
+      </Link>
       <Text
         style={{ color: "#fff", fontSize: 10, marginTop: 5 }}
         numberOfLines={1}
@@ -104,7 +69,17 @@ export default function TrendingMovies({
       >
         {title}
       </Text>
+      <Text style={{ color: "#fff", fontSize: 10 }}>
+        {release_date ? new Date(release_date).getFullYear() : ""}
+      </Text>
 
+      <View style={{ flexDirection: "row", marginTop: 3 }}>
+        {Array.from({
+          length: Math.floor(vote_average / 3),
+        }).map((_, index) => (
+          <Ionicons key={index} name="star" size={12} color="yellow" />
+        ))}
+      </View>
     </TouchableOpacity>
   );
 }

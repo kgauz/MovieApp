@@ -3,6 +3,7 @@ export interface Movie {
   backdrop_path: string | null;
   genre_ids: number[];
   id: number;
+  movie_type:string;
   original_language: string;
   original_title: string;
   overview: string;

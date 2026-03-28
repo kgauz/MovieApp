@@ -7,8 +7,12 @@ export default async function saveSearchToDB(movie) {
         movieID: movie.id,
         title: movie.title,
         poster_url: movie.poster_path,
+        movieType:movie.media_type,
       }),
     });
+
+    const data = await res.json();
+    console.log(data);
 
   } catch (err) {
     console.log("Error saving search:", err);

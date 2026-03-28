@@ -1,47 +1,97 @@
-import MovieLoader from "@/movieLoader";
+import TrendingMovies from "@/trendingMovies";
 import fetchMovies from "@/services/api";
 import useFetch from "@/services/useFech";
-import { Ionicons } from "@expo/vector-icons";
-import React, { useState, useEffect } from "react";
 import saveSearchToDB from "@/saveSearch";
+import React, { useState, useEffect } from "react";
 import {
   ActivityIndicator,
   FlatList,
-  Image,
   Text,
-  TextInput, useWindowDimensions,
+  TextInput,
+  useWindowDimensions,
   View,
 } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { LinearGradient } from "expo-linear-gradient";
-import { useLocalSearchParams } from "expo-router";
+import { Ionicons } from "@expo/vector-icons";
+import fetchTrending from "@/services/fetchTrending"
 
 export default function Search() {
-    const { query } = useLocalSearchParams();
-    const [searchText, setSearchText] = useState(
-      typeof query === "string" ? query : ""
-    );
-    console.log(query);
-    const { width } = useWindowDimensions();
-    const spacing = 10; // horizontal margin between cards
-    const columns = width > 900 ? 6 : width > 600 ? 5 : 3;
-  
+  const [searchText, setSearchText] = useState("");
+  const [suggestions, setSuggestions] = useState([]);
+  const [trending, setTrending] = useState([]);
 
+  const { width } = useWindowDimensions();
+  const spacing = 10;
+  const columns = width > 900 ? 6 : width > 600 ? 5 : 3;
   const cardWidth = (width - spacing * (columns + 1)) / columns;
 
   const {
     data: movies,
-    loading: moviesLoading,
-    error: moviesError,
+    loading,
+    error,
     refetch: fetch,
-    reset: reset,
+    reset,
   } = useFetch(() => fetchMovies({ query: searchText }), false);
 
+  //  Fetch Trending
+
+  useEffect(() => {
+  const getTrending = async () => {
+    try {
+
+      const data = await  fetchTrending();
+
+      if (!Array.isArray(data)) return;
+
+      const mapped = data.map((m: any) => ({
+        id: Number(m.movieID),
+        title: m.title,
+        poster_path: m.poster_url
+          ? `https://image.tmdb.org/t/p/w500${m.poster_url}`
+          : null,
+        backdrop_path: null,
+        media_type: m.mediaType,
+        adult: false,
+        genre_ids: [],
+        original_language: "en",
+        original_title: m.title,
+        overview: "",
+        popularity: m.count || 0,
+        release_date: "",
+        video: false,
+        vote_average: 0,
+        vote_count: 0,
+      }));
+
+      setTrending(mapped);
+    } catch (err) {
+      console.log("Error fetching trending:", err);
+      setTrending([]); 
+    }
+  };
+
+  getTrending();
+}, []);
+
+  
   useEffect(() => {
     if (!searchText.trim()) {
+      setSuggestions([]);
       reset();
       return;
     }
+
+    const timer = setTimeout(async () => {
+      const res = await fetchMovies({ query: searchText });
+      setSuggestions(res?.slice(0, 5) || []);
+    }, 300);
+
+    return () => clearTimeout(timer);
+  }, [searchText]);
+
+  useEffect(() => {
+    if (!searchText.trim()) return;
 
     const timer = setTimeout(() => {
       fetch();
@@ -50,134 +100,156 @@ export default function Search() {
     return () => clearTimeout(timer);
   }, [searchText]);
 
+  // Save search
   useEffect(() => {
-    if (!movies || movies.length === 0) return;
-
-    const firstMovie = movies[0];
-    saveSearchToDB(firstMovie);
+    if (movies?.length > 0) {
+      saveSearchToDB(movies[0]);
+      console.error(movies[0]);
+    }
   }, [movies]);
+
+
+
+  const showTrending = !searchText.trim();
 
   return (
     <LinearGradient
-      colors={[
-        "rgb(10,10,20)",
-        "rgb(25,0,50)",
-        "rgb(75,0,130)",
-        "rgb(15,15,30)",
-      ]}
-      locations={[0, 0.35, 0.7, 1]}
-      start={{ x: 0, y: 0 }}
-      end={{ x: 1, y: 1 }}
+      colors={["#0f0f1e", "#1a0033", "#2d0066", "#0f0f1e"]}
       style={{ flex: 1 }}
     >
-      <View style={{ flex: 1 , marginBottom:80}}>
-        <View style={{ alignItems: "center", marginTop: 30 }}>
-          <Image
-            source={require("@/assets/images/movielogo.png")}
+      <SafeAreaView style={{ flex: 1, marginBottom:90 }}>
+
+        
+        <View
+          style={{
+            width: "90%",
+            alignSelf: "center",
+            marginTop: 15,
+            borderRadius: 30,
+            backgroundColor: "rgba(255,255,255,0.06)",
+            borderWidth: 1,
+            borderColor: "rgba(255,255,255,0.12)",
+            flexDirection: "row",
+            alignItems: "center",
+            paddingHorizontal: 15,
+            height: 50,
+          }}
+        >
+          <Ionicons name="search" size={20} color="#aaa" />
+
+          <TextInput
+            value={searchText}
+            onChangeText={setSearchText}
+            placeholder="Search movies, series..."
+            placeholderTextColor="#888"
             style={{
-              width: 110,
-              height: 110,
-              marginBottom: 10,
+              flex: 1,
+              marginLeft: 10,
+              color: "#fff",
             }}
-            resizeMode="contain"
           />
+
+          {searchText.length > 0 && (
+            <Ionicons
+              name="close-circle"
+              size={18}
+              color="#aaa"
+              onPress={() => setSearchText("")}
+            />
+          )}
         </View>
 
-        <SafeAreaView style={{ flex: 1,width: "100%", marginTop: 3 }}>
-          {moviesLoading ? (
-            <ActivityIndicator
-              size="large"
-              color="#9b5cff"
-              style={{ marginTop: 20 }}
-            />
-          ) : moviesError ? (
-            <Text style={{ color: "white" }}>
-              Error: {moviesError?.message}
-            </Text>
-          ) : (
-            <View style={{flex:1, width: "100%" }}>
-              <View>
-                <View style={{ flex:1,width: "90%",alignSelf:"center", marginTop: 10,position: "relative" }}>
-                <Ionicons
-                name="search"
-                size={20}
-                color="#fff"
-                style={{
-                position: "absolute",
-                left: 20,
-                top: 12,
-                 zIndex: 1,
-                 }}
-                />
-
-                <TextInput
-                value={searchText}
-                onChangeText={setSearchText}
-                placeholder="Search movies..."
-                 placeholderTextColor="#94a3b8"
-                style={{
-                height: 45,
-                backgroundColor: "rgba(255,255,255,0.08)",
-                borderRadius: 25,
-                 paddingLeft: 50,
-                 color: "#fff",
-                borderWidth: 1,
-               borderColor: "rgba(255,255,255,0.15)",
+        {/* Suggestions */}
+        {suggestions.length > 0 && (
+          <View
+            style={{
+              width: "90%",
+              alignSelf: "center",
+              backgroundColor: "#111",
+              borderRadius: 10,
+              marginTop: 5,
+            }}
+          >
+            {suggestions.map((item) => (
+              <Text
+                key={item.id}
+                onPress={() => {
+                  setSearchText(item.title);
+                  setSuggestions([]);
                 }}
-                 />
-                </View>
+                style={{
+                  padding: 12,
+                  color: "#ddd",
+                }}
+              >
+                {item.title}
+              </Text>
+            ))}
+          </View>
+        )}
 
-                <Text
-                  style={{
-                    marginTop: 20,
-                    marginBottom: 10,
-                    marginLeft:15,
-                    color: "#fff",
-                    fontSize: 16,
-                    fontWeight: "500",
-                  }}
-                >
-                  Search Results {searchText}
-                </Text>
+        {/*  Title */}
+        <Text
+          style={{
+            color: "#fff",
+            fontSize: 25,
+            marginLeft: 20,
+            marginTop: 20,
+            marginBottom: 10,
+            fontWeight: "600",
+          }}
+        >
+          {showTrending
+            ? " Trending Now"
+            : `Results for "${searchText}"`}
+        </Text>
 
-                {!moviesLoading &&
-                  !moviesError &&
-                  movies?.length === 0 &&
-                  searchText.trim() !== "" && (
-                    <Text style={{ marginTop: 10, color: "#fff" }}>
-                      Movies not found
-                    </Text>
-                  )}
+        {/* Error */}
+        {error && (
+          <Text style={{ color: "red", marginLeft: 20 }}>
+            {error.message}
+          </Text>
+        )}
+
+        {/*  Loader */}
+        {loading ? (
+          <ActivityIndicator
+            size="large"
+            color="#9b5cff"
+            style={{ marginTop: 30 }}
+          />
+        ) : (
+          <FlatList
+            data={showTrending ? trending : movies}
+            key={columns}
+            keyExtractor={(item) => item.id.toString()}
+            numColumns={columns}
+            showsVerticalScrollIndicator={false}
+            columnWrapperStyle={{
+              justifyContent: "flex-start",
+              paddingHorizontal: spacing/2,
+               flexWrap: "wrap",
+              marginBottom: 10,
+            }}
+            
+            renderItem={({ item }) => (
+              <View style={{ width: cardWidth, margin: spacing/2 }}>
+                <TrendingMovies{...item} />
               </View>
+            )}
+          />
+        )}
 
-              <View style={{ flex: 1 }}>
-                <FlatList
-                  data={movies}
-                  key={columns}
-                  keyExtractor={(item) => item.id.toString()}
-                  numColumns={columns}
-                  showsVerticalScrollIndicator={false}
-                  columnWrapperStyle={{
-                      paddingHorizontal: spacing / 2,   justifyContent: "flex-start",
-                   
-                    }}
-                  renderItem={({ item }) => (
-                    <View
-                      style={{
-                      margin: spacing / 2 ,
-                      width: cardWidth,
-                      
-                      }}
-                    >
-                      <MovieLoader {...item} />
-                    </View>
-                  )}
-                />
-              </View>
-            </View>
-          )}
-        </SafeAreaView>
-      </View>
+        {/* Empty state */}
+        {!loading && !showTrending && movies?.length === 0 && (
+          <View style={{ alignItems: "center" , justifyContent:"center"}}>
+            <Ionicons name="film-outline" size={50} color="#666" />
+            <Text style={{ color: "#aaa", marginTop: 10 }}>
+              No results found
+            </Text>
+          </View>
+        )}
+      </SafeAreaView>
     </LinearGradient>
   );
 }

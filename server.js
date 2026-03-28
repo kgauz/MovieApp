@@ -25,7 +25,7 @@ mongoose.connect(process.env.MONGO_URI)
 // Trending endpoint
 app.get("/trending", async (req, res) => {
   try {
-    const movies = await Movie.find().sort({ count: -1 }).limit(10);
+    const movies = await Movie.find().sort({ count: -1 });
     res.json(movies);
   } catch (err) {
     res.status(500).json({ error: err.message });
@@ -46,7 +46,7 @@ app.get("/movies", async (req, res) => {
 // Search endpoint
 app.post("/search", async (req, res) => {
   try {
-    const { movieID, title, poster_url } = req.body;
+    const { movieID, title, poster_url,movieType } = req.body;
     if (!movieID || !title) return res.status(400).json({ error: "Invalid movie data" });
 
     const existingMovie = await Movie.findOne({ movieID });
@@ -56,7 +56,7 @@ app.post("/search", async (req, res) => {
       return res.json(existingMovie);
     }
 
-    const newMovie = await Movie.create({ movieID, title, poster_url, count: 1 });
+    const newMovie = await Movie.create({ movieID,movieType, title, poster_url, count: 1 });
     res.json(newMovie);
   } catch (error) {
     console.error("SEARCH ERROR:", error);
@@ -80,7 +80,7 @@ app.post("/register", async (req, res) => {
       password:hashedPassword,
     });
 
-    await newUser.save();  //  THIS saves to database
+    await newUser.save();  
 
     // console.log("User saved!");
 
@@ -175,7 +175,6 @@ app.post("/save-movie", auth, async (req, res) => {
   try {
     const userID = req.user.id; // token is already verified in auth middleware
     const { movie } = req.body;
-       console.log("Backend received movie:", movie); // <-- add this
   
 
     if (!movie) return res.status(400).json({ msg: "No movie provided" });
@@ -197,14 +196,12 @@ app.post("/save-movie", auth, async (req, res) => {
     const newEntry = new UserList({
       userID,
       movieID: movie.id,
-      typeMovie: "movie",
+      typeMovie: "movie" || "tv",
       title: movie.title,
       poster:  movie.poster_path ? `${baseURL}${movie.poster_path}` : movie.poster,
       releaseDate: movie.release_date || movie.releaseDate,
       rating: movie.vote_average || movie.rating,
     });
-
-    console.log("Saving to database:", newEntry); // <-- add this
 
     await newEntry.save();
     return res.json({ msg: "Saved successfully" });

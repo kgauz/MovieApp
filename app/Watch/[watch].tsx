@@ -1,12 +1,12 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { View, ActivityIndicator, Platform } from "react-native";
 import { useLocalSearchParams } from "expo-router";
 import { WebView } from "react-native-webview";
 import { Linking } from "react-native";
 
 export default function Watch() {
-  const { watch } = useLocalSearchParams();
-  const Movieid = "1234821";
+  
+  const { watch, type, season, episode } = useLocalSearchParams();
  
   const [loading, setLoading] = useState(true);
 
@@ -14,7 +14,28 @@ export default function Watch() {
   console.log("No movie ID provided — loading default movie 123");
 }
 
-     const url = `https://vidsrc.cc/v2/embed/movie/${watch}`;
+
+  const defaultMovie = "1234821";
+  const movieId = watch || defaultMovie;
+
+// let url =
+//   type === "tv"
+//     ? `https://vidsrc.cc/v2/embed/tv/${movieId}/1/1`
+//     : `https://vidsrc.cc/v2/embed/movie/${movieId}`;
+
+//     const movieId = watch || "1234821";
+
+let url = "";
+
+if (type === "tv") {
+  const s = season || 1;
+  const e = episode || 1;
+
+  url = `https://vidsrc.cc/v2/embed/tv/${movieId}/${s}/${e}`;
+} else {
+  url = `https://vidsrc.cc/v2/embed/movie/${movieId}`;
+}
+
    
   
      if (Platform.OS === "web") {

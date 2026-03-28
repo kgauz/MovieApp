@@ -26,40 +26,78 @@ const userRatingSize = scale(13);
 const overView = scale(18)
 
 export default function MovieDetails() {
-  const { id } = useLocalSearchParams();
+  const { id , type} = useLocalSearchParams();
   const [movie, setMovie] = useState(null);
   const router = useRouter();
   const [isSaved, setIsSaved] = useState(false);
+  console.log("TYPE:", type);
+  const [selectedSeason, setSelectedSeason] = useState(1);
+const [episodes, setEpisodes] = useState([]);
+
+
+const parsedId =
+  typeof id === "string"
+    ? Number(id)
+    : Number(id?.[0]);
+
+const parsedType =
+  typeof type === "string"
+    ? type
+    : type?.[0];
 
   const API_KEY = process.env.EXPO_PUBLIC_MOVIE_API_KEY; 
 
-  useEffect(() => {
-    fetch(`https://api.themoviedb.org/3/movie/${id}`, {
-      headers: {
-        accept: 'application/json',
-        Authorization: `Bearer ${API_KEY}`,
-      }
-    })
-      .then(res => res.json())
-      .then(data => setMovie(data));
-   
-  }, [id]);
+useEffect(() => {
+   //wait until both exist
+
+  //console.log(type);
+
+  const endpoint =
+    parsedType === "tv"
+      ? `https://api.themoviedb.org/3/tv/${parsedId}`
+      : `https://api.themoviedb.org/3/movie/${parsedId}`;
+
+  fetch(endpoint, {
+    headers: {
+      accept: "application/json",
+      Authorization: `Bearer ${API_KEY}`,
+    },
+  })
+    .then(res => res.json())
+    .then(data => setMovie(data))
+    .catch(err => console.log(err));
+}, [parsedId, parsedType]);
+
+useEffect(() => {
+  if (parsedType !== "tv") return;
+
+  fetch(`https://api.themoviedb.org/3/tv/${parsedId}/season/${selectedSeason}`, {
+    headers: {
+      accept: "application/json",
+      Authorization: `Bearer ${API_KEY}`,
+    },
+  })
+    .then(res => res.json())
+    .then(data => setEpisodes(data.episodes))
+    .catch(err => console.log(err));
+}, [selectedSeason]);
+
+
 
   useEffect(() => {
   checkSaved();
 }, []);
 
-
-
 const checkSaved = async () => {
   const stored = await AsyncStorage.getItem("saved");
   const savedItems = stored ? JSON.parse(stored) : [];
 
-  const exists = savedItems.find((item: any) => item.id === Number(id));
+  const exists = savedItems.find((item: any) => item.id === parsedId);
   setIsSaved(!!exists);
 };
 
-  if (!movie) return (
+  if (!movie) 
+    return (
    <LinearGradient
       colors={[
         "rgb(10,10,20)",
@@ -81,15 +119,21 @@ const checkSaved = async () => {
       </LinearGradient>
 
   );
+
+const displayTitle = movie.title || movie.name;
+const displayDate = movie.release_date || movie.first_air_date;
+const displayRuntime =
+  movie.runtime || (movie.episode_run_time?.[0] ?? "N/A");
   const handleSave = async () => {
   if (!movie) return;
   console.log("movie not accessed");
 
   const result = await saveMovie({
     id: movie.id,
-    title: movie.title,
+     title: movie.title || movie.name,
     poster: movie.poster_path,
-    release_date:movie.release_date,
+   
+      release_date: movie.release_date || movie.first_air_date,
     rating: movie.vote_average,
   });
  
@@ -112,6 +156,36 @@ const checkSaved = async () => {
 
   Alert.alert(result.msg);
   setIsSaved(!isSaved);
+};
+
+
+const addToRecentlyPlayed = async (id:number, type:string) => {
+  try {
+    const existing = await AsyncStorage.getItem("recent");
+
+    console.error("existing",existing);
+    
+
+    let recentList = existing ? JSON.parse(existing) : [];
+
+    // remove duplicates
+    recentList = recentList.filter((item: any) => item.id !== id);
+
+    // add new item at top
+    recentList.unshift({
+        id,
+        type,
+        title: movie.title || movie.name,
+        poster_path: movie.poster_path,
+        vote_average: movie.vote_average,
+      });
+
+    recentList = recentList.slice(0, 10);
+
+    await AsyncStorage.setItem("recent", JSON.stringify(recentList));
+  } catch (error) {
+    console.log("Error saving recent:", error);
+  }
 };
 
   return (
@@ -159,7 +233,7 @@ const checkSaved = async () => {
             fontWeight: "bold",
           }}
         >
-          {movie.title}
+          {displayTitle}
         </Text>
 
         {/* Meta Info */}
@@ -172,16 +246,16 @@ const checkSaved = async () => {
           }}
         >
           <Text style={{ color: "#aaa", fontSize:userRatingSize  }}>
-            {movie.release_date}
+            {displayDate}
           </Text>
 
           <Text style={{ color: "#aaa", fontSize:userRatingSize }}>
             {movie.genres?.map(g => g.name).join(" • ")}
           </Text>
 
-          {movie.runtime && (
+          {displayRuntime && (
             <Text style={{ color: "#aaa", fontSize: userRatingSize }}>
-              {movie.runtime} min
+              {displayRuntime} min
             </Text>
           )}
         </View>
@@ -197,6 +271,7 @@ const checkSaved = async () => {
             }}
           >
             {movie.tagline}
+           
           </Text>
         ) : null}
 
@@ -260,6 +335,65 @@ const checkSaved = async () => {
         >
           {movie.overview}
         </Text>
+        {parsedType === "tv" && (
+  <>
+    {/*  Seasons */}
+    <View style={{ flexDirection: "row", marginTop: 20 }}>
+      {movie.seasons?.map((season: any) => (
+        <TouchableOpacity
+          key={season.id}
+          onPress={() => setSelectedSeason(season.season_number)}
+          style={{
+            padding: 10,
+            backgroundColor:
+              selectedSeason === season.season_number ? "#9b5cff" : "#333",
+            marginRight: 10,
+            borderRadius: 10,
+          }}
+        >
+           <ScrollView horizontal showsHorizontalScrollIndicator={false}>
+         <Text style={{ color: "#fff" }} numberOfLines={1}>
+            S{season.season_number}
+          </Text>
+      </ScrollView>
+        </TouchableOpacity>
+      ))}
+    </View>
+
+    {/* Episodes */}
+    <View style={{ marginTop: 20 }}>
+      {episodes.map((ep: any) => (
+        <TouchableOpacity
+          key={ep.id}
+          onPress={() =>{
+            router.push({
+              pathname: `/Watch/${id}`,
+              params: {
+                type: "tv",
+                season: selectedSeason,
+                episode: ep.episode_number,
+              },
+            });
+             addToRecentlyPlayed(parsedId, parsedType);
+            
+          }}
+     
+          style={{
+            padding: 12,
+            borderBottomWidth: 1,
+            borderBottomColor: "#333",
+          }}
+        >
+           <ScrollView horizontal showsHorizontalScrollIndicator={false}>
+        <Text style={{ color: "#fff" }} numberOfLines={1}>
+          E{ep.episode_number} - {ep.name}
+        </Text>
+      </ScrollView>
+        </TouchableOpacity>
+      ))}
+    </View>
+  </>
+)}
    
    <View style={{ flex: 1, flexDirection:"row", gap:20, alignItems: "center", marginTop: 30 }}>
 
@@ -273,7 +407,16 @@ const checkSaved = async () => {
       borderRadius: 20,
       alignItems: "center",
     }}
-    onPress={() => router.push(`/Watch/${id}`)}
+      onPress={() => {
+  router.push({
+    pathname: `/Watch/${parsedId}`,
+    params: { type: parsedType },
+  });
+
+  addToRecentlyPlayed(parsedId, parsedType);
+}}
+  
+
   >
     <Text
       style={{

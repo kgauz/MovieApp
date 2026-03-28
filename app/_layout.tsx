@@ -21,7 +21,12 @@ export default function RootLayout() {
          <Stack.Screen name="profileStuff1/termsOfService" options={{ headerShown: false }} />
           <Stack.Screen name="profileStuff1/aboutUs" options={{ headerShown: false }} />
           <Stack.Screen name="profileStuff1/privacyPolicy" options={{ headerShown: false }} />
+          <Stack.Screen name="moviesOnly" options={{ headerShown: false }} />
+          <Stack.Screen name="seriesOnly" options={{ headerShown: false }} />
+           <Stack.Screen name="index" options={{ headerShown: false }} />
+
     </Stack>
+    
     </>
   );
 }
