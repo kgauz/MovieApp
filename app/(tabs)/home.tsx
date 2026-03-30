@@ -295,7 +295,7 @@ useFocusEffect(
 
 
 {featuredMovie && (
-  <View style={{ width: "100%", height: heroHeight, minHeight: 320,maxHeight: 5000, position: "relative", marginTop: 0 , overflow:"hidden"}}>
+  <View style={{ width: "100%", height: heroHeight, minHeight: 320,maxHeight: 5000, position: "relative" , overflow:"hidden"}}>
 
     {/* Background Image */}
     <Image
@@ -475,7 +475,7 @@ useFocusEffect(
 )}
 
 
-
+<View style={{}}>
       {recent?.length > 0 && (
   <>
     <Text style={{ color: "#fff", margin: 10, marginTop: 20, fontSize:20 }}>
@@ -499,10 +499,11 @@ useFocusEffect(
 
   </>
 )}
+</View>
 
 
-<View style={{ flex:1 }}>
     {/* Trending movie this week TV */}
+  <View style={{}}>
     <Text style={{ color: "#fff", margin: 10, marginTop: 20,  fontSize:20 }}>
       Trending movie this week
     </Text>
@@ -520,14 +521,11 @@ useFocusEffect(
         </View>
       )}
     />
-    
+    </View>
 
-  </View>
-   
 
- 
-<View style={{ flex:1 }}>
-     {/* Trending series this week TV */}
+    {/* Trending series this week TV */}
+    <View style={{}}>
     <Text style={{ color: "#fff", margin: 10, marginTop: 20,  fontSize:20 }}>
       Trending series this week
     </Text>
@@ -543,12 +541,11 @@ useFocusEffect(
         </View>
       )}
     />
-     
     </View>
-
-    
-  <View style={{ flex:1 }}>
+     
+ 
     {/* Latest TV */}
+    <View style={{}}> 
     <Text style={{ color: "#fff", margin: 10, marginTop: 20,  fontSize:20 }}>
       Latest TV Series
     </Text>
@@ -564,13 +561,11 @@ useFocusEffect(
         </View>
       )}
     />
+    </View>
 
-   
-  </View>
-     
-
-  <View style={{ flex:1 }}>
+    
     {/* Latest Movies */}
+    <View style={{}}>
     <Text style={{ color: "#fff", margin: 10, marginTop: 20,  fontSize:20 }}>
       Popular Movies
     </Text>
@@ -586,14 +581,10 @@ useFocusEffect(
         </View>
       )}
     />
+   </View>
 
 
-    </View>
-
-
-   
-
-  <View style={{ flex:1 }}>
+   <View style={{}}>
     <Text style={{ color: "#fff", margin: 10, marginTop: 20,  fontSize:20 }}>
       Popular Series
     </Text>
@@ -609,12 +600,10 @@ useFocusEffect(
         </View>
       )}
     />
-      
     </View>
 
     
-
-  <View style={{flex:1}}>
+    <View style={{}}> 
      <Text style={{ color: "#fff", margin: 10, marginTop: 20 ,  fontSize:20}}>
       Top Rated Movies
     </Text>
@@ -630,13 +619,13 @@ useFocusEffect(
         </View>
       )}
     />
-      </View>
+  </View>
 
-
-  <View style={{flex:1 }}>
+  <View style={{}}>
      <Text style={{ color: "#fff", margin: 10, marginTop: 20,  fontSize:20 }}>
       Top Rated Series
     </Text>
+
 
     <FlatList
       horizontal
@@ -649,12 +638,9 @@ useFocusEffect(
         </View>
       )}
     />
-
-   
-
-  </View>
-
-  <View style={{ flex:1 }}>
+    </View>
+  
+  <View style={{}}>
     <Text style={{ color: "#fff", margin: 10, marginTop: 20,  fontSize:20 }}>
       Now Playing Movies
     </Text>
@@ -670,10 +656,10 @@ useFocusEffect(
         </View>
       )}
     />
+  </View>
     
-    </View>
 
-  <View style={{ flex:1, marginBottom:90}}>
+  <View style={{  marginBottom:90}}>
     <Text style={{ color: "#fff", margin: 10, marginTop: 20,  fontSize:20 }}>
       On The Air Series
     </Text>
