@@ -338,27 +338,31 @@ const addToRecentlyPlayed = async (id:number, type:string) => {
         {parsedType === "tv" && (
   <>
     {/*  Seasons */}
-    <View style={{ flexDirection: "row", marginTop: 20 }}>
+   <ScrollView
+  horizontal
+  showsHorizontalScrollIndicator={false}
+  style={{ marginTop: 20, flexDirection:"row" }}
+>
       {movie.seasons?.map((season: any) => (
         <TouchableOpacity
           key={season.id}
           onPress={() => setSelectedSeason(season.season_number)}
           style={{
-            padding: 10,
+            padding:10,
             backgroundColor:
               selectedSeason === season.season_number ? "#9b5cff" : "#333",
             marginRight: 10,
             borderRadius: 10,
+            maxHeight:40,
           }}
         >
-           <ScrollView horizontal showsHorizontalScrollIndicator={false}>
+        
          <Text style={{ color: "#fff" }} numberOfLines={1}>
             S{season.season_number}
           </Text>
-      </ScrollView>
         </TouchableOpacity>
       ))}
-    </View>
+    </ScrollView>
 
     {/* Episodes */}
     <View style={{ marginTop: 20 }}>
@@ -384,11 +388,9 @@ const addToRecentlyPlayed = async (id:number, type:string) => {
             borderBottomColor: "#333",
           }}
         >
-           <ScrollView horizontal showsHorizontalScrollIndicator={false}>
-        <Text style={{ color: "#fff" }} numberOfLines={1}>
+        <Text style={{ color: "#fff" }} >
           E{ep.episode_number} - {ep.name}
         </Text>
-      </ScrollView>
         </TouchableOpacity>
       ))}
     </View>

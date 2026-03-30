@@ -291,7 +291,7 @@ export default function SeriesOnly() {
             </View>
           )}
 
-          <View style={{ position: "relative" }}>
+          <View style={{flex:1 }}>
                {/* Trending series this week TV */}
               <Text style={{ color: "#fff", margin: 10, marginTop: 20,  fontSize:20 }}>
                 Trending series this week
@@ -308,24 +308,11 @@ export default function SeriesOnly() {
                   </View>
                 )}
               />
-                <Ionicons
-              name="chevron-forward"
-              size={28}
-              color="#fff"
-              
-              style={{
-                position: "absolute",
-                right:0,
-                top: "50%",
-                transform: [{ translateY: -14 }],
-                opacity: 0.7,
-                backgroundColor:"#000"
-              }}
-            />
+        
               </View>
 
 
-            <View style={{ position: "relative" }}>
+            <View style={{ flex:1}}>
               {/* Latest TV */}
               <Text style={{ color: "#fff", margin: 10, marginTop: 20,  fontSize:20 }}>
                 Latest  Series
@@ -343,24 +330,10 @@ export default function SeriesOnly() {
                 )}
               />
           
-                <Ionicons
-              name="chevron-forward"
-              size={28}
-              color="#fff"
-              
-              style={{
-                position: "absolute",
-                right:0,
-                top: "50%",
-                transform: [{ translateY: -14 }],
-                opacity: 0.7,
-                backgroundColor:"#000"
-              }}
-            />
             </View>
 
           {/* Popular Series */}
-            <View style={{ position: "relative" }}>
+            <View style={{ flex:1}}>
               <Text style={{ color: "#fff", margin: 10, marginTop: 20,  fontSize:20 }}>
                 Popular Series
               </Text>
@@ -376,26 +349,13 @@ export default function SeriesOnly() {
                   </View>
                 )}
               />
-                <Ionicons
-              name="chevron-forward"
-              size={28}
-              color="#fff"
-              
-              style={{
-                position: "absolute",
-                right:0,
-                top: "50%",
-                transform: [{ translateY: -14 }],
-                opacity: 0.7,
-                backgroundColor:"#000"
-              }}
-            />
+            
               </View>
           
 
           {/* Top Rated Series */}
          
-           <View style={{ position: "relative" }}>
+           <View style={{ flex:1 }}>
               <Text style={{ color: "#fff", margin: 10, marginTop: 20,  fontSize:20 }}>
                Top Rated Series
              </Text>
@@ -412,27 +372,14 @@ export default function SeriesOnly() {
                )}
              />
          
-              <Ionicons
-             name="chevron-forward"
-             size={28}
-             color="#fff"
-             
-             style={{
-               position: "absolute",
-               right:0,
-               top: "50%",
-               transform: [{ translateY: -14 }],
-               opacity: 0.7,
-               backgroundColor:"#000"
-             }}
-           />
+          
          
            </View>
          
 
           {/* On The Air Series */}
           
-            <View style={{ position: "relative"}}>
+            <View style={{flex:1}}>
               <Text style={{ color: "#fff", margin: 10, marginTop: 20,  fontSize:20 }}>
                 On The Air Series
               </Text>
@@ -448,20 +395,7 @@ export default function SeriesOnly() {
                   </View>
                 )}
               />
-               <Ionicons
-              name="chevron-forward"
-              size={28}
-              color="#fff"
-              
-              style={{
-                position: "absolute",
-                right:0,
-                top: "50%",
-                transform: [{ translateY: -14 }],
-                opacity: 0.7,
-                backgroundColor:"#000"
-              }}
-            />
+            
           
               </View>
 

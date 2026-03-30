@@ -477,7 +477,7 @@ useFocusEffect(
 
 
 
-<View style={{ position: "relative" }}>
+<View style={{ flex:1 }}>
       {recent?.length > 0 && (
   <>
     <Text style={{ color: "#fff", margin: 10, marginTop: 20, fontSize:20 }}>
@@ -497,26 +497,13 @@ useFocusEffect(
 
       )}
     />
-     <Ionicons
-    name="chevron-forward"
-    size={28}
-    color="#fff"
-    
-    style={{
-      position: "absolute",
-      right:0,
-      top: "50%",
-      transform: [{ translateY: -14 }],
-      opacity: 0.7,
-      backgroundColor:"#000"
-    }}
-  />
+     
 
   </>
 )}
 </View>
 
-<View style={{ position: "relative" }}>
+<View style={{ flex:1 }}>
     {/* Trending movie this week TV */}
     <Text style={{ color: "#fff", margin: 10, marginTop: 20,  fontSize:20 }}>
       Trending movie this week
@@ -535,26 +522,13 @@ useFocusEffect(
         </View>
       )}
     />
-     <Ionicons
-    name="chevron-forward"
-    size={28}
-    color="#fff"
     
-    style={{
-      position: "absolute",
-      right:0,
-      top: "50%",
-      transform: [{ translateY: -14 }],
-      opacity: 0.7,
-      backgroundColor:"#000"
-    }}
-  />
 
   </View>
    
 
  
-<View style={{ position: "relative" }}>
+<View style={{ flex:1 }}>
      {/* Trending series this week TV */}
     <Text style={{ color: "#fff", margin: 10, marginTop: 20,  fontSize:20 }}>
       Trending series this week
@@ -571,24 +545,11 @@ useFocusEffect(
         </View>
       )}
     />
-      <Ionicons
-    name="chevron-forward"
-    size={28}
-    color="#fff"
-    
-    style={{
-      position: "absolute",
-      right:0,
-      top: "50%",
-      transform: [{ translateY: -14 }],
-      opacity: 0.7,
-      backgroundColor:"#000"
-    }}
-  />
+     
     </View>
 
     
-  <View style={{ position: "relative" }}>
+  <View style={{ flex:1 }}>
     {/* Latest TV */}
     <Text style={{ color: "#fff", margin: 10, marginTop: 20,  fontSize:20 }}>
       Latest TV Series
@@ -606,24 +567,11 @@ useFocusEffect(
       )}
     />
 
-      <Ionicons
-    name="chevron-forward"
-    size={28}
-    color="#fff"
-    
-    style={{
-      position: "absolute",
-      right:0,
-      top: "50%",
-      transform: [{ translateY: -14 }],
-      opacity: 0.7,
-      backgroundColor:"#000"
-    }}
-  />
+   
   </View>
      
 
-  <View style={{ position: "relative" }}>
+  <View style={{ flex:1 }}>
     {/* Latest Movies */}
     <Text style={{ color: "#fff", margin: 10, marginTop: 20,  fontSize:20 }}>
       Popular Movies
@@ -641,26 +589,13 @@ useFocusEffect(
       )}
     />
 
-      <Ionicons
-    name="chevron-forward"
-    size={28}
-    color="#fff"
-    
-    style={{
-      position: "absolute",
-      right:0,
-      top: "50%",
-      transform: [{ translateY: -14 }],
-      opacity: 0.7,
-      backgroundColor:"#000"
-    }}
-  />
+
     </View>
 
 
    
 
-  <View style={{ position: "relative" }}>
+  <View style={{ flex:1 }}>
     <Text style={{ color: "#fff", margin: 10, marginTop: 20,  fontSize:20 }}>
       Popular Series
     </Text>
@@ -676,25 +611,12 @@ useFocusEffect(
         </View>
       )}
     />
-      <Ionicons
-    name="chevron-forward"
-    size={28}
-    color="#fff"
-    
-    style={{
-      position: "absolute",
-      right:0,
-      top: "50%",
-      transform: [{ translateY: -14 }],
-      opacity: 0.7,
-      backgroundColor:"#000"
-    }}
-  />
+      
     </View>
 
     
 
-  <View style={{ position: "relative" }}>
+  <View style={{flex:1}}>
      <Text style={{ color: "#fff", margin: 10, marginTop: 20 ,  fontSize:20}}>
       Top Rated Movies
     </Text>
@@ -710,24 +632,10 @@ useFocusEffect(
         </View>
       )}
     />
-    <Ionicons
-    name="chevron-forward"
-    size={28}
-    color="#fff"
-    
-    style={{
-      position: "absolute",
-      right:0,
-      top: "50%",
-      transform: [{ translateY: -14 }],
-      opacity: 0.7,
-      backgroundColor:"#000"
-    }}
-  />
-    </View>
+      </View>
 
 
-  <View style={{ position: "relative" }}>
+  <View style={{flex:1 }}>
      <Text style={{ color: "#fff", margin: 10, marginTop: 20,  fontSize:20 }}>
       Top Rated Series
     </Text>
@@ -744,24 +652,11 @@ useFocusEffect(
       )}
     />
 
-     <Ionicons
-    name="chevron-forward"
-    size={28}
-    color="#fff"
-    
-    style={{
-      position: "absolute",
-      right:0,
-      top: "50%",
-      transform: [{ translateY: -14 }],
-      opacity: 0.7,
-      backgroundColor:"#000"
-    }}
-  />
+   
 
   </View>
 
-  <View style={{ position: "relative" }}>
+  <View style={{ flex:1 }}>
     <Text style={{ color: "#fff", margin: 10, marginTop: 20,  fontSize:20 }}>
       Now Playing Movies
     </Text>
@@ -777,23 +672,10 @@ useFocusEffect(
         </View>
       )}
     />
-     <Ionicons
-    name="chevron-forward"
-    size={28}
-    color="#fff"
     
-    style={{
-      position: "absolute",
-      right:0,
-      top: "50%",
-      transform: [{ translateY: -14 }],
-      opacity: 0.7,
-      backgroundColor:"#000"
-    }}
-  />
     </View>
 
-  <View style={{ position: "relative" , marginBottom:90}}>
+  <View style={{ flex:1, marginBottom:90}}>
     <Text style={{ color: "#fff", margin: 10, marginTop: 20,  fontSize:20 }}>
       On The Air Series
     </Text>
@@ -809,20 +691,7 @@ useFocusEffect(
         </View>
       )}
     />
-     <Ionicons
-    name="chevron-forward"
-    size={28}
-    color="#fff"
-    
-    style={{
-      position: "absolute",
-      right:0,
-      top: "50%",
-      transform: [{ translateY: -14 }],
-      opacity: 0.7,
-      backgroundColor:"#000"
-    }}
-  />
+     
 
     </View>
 

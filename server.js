@@ -25,7 +25,7 @@ mongoose.connect(process.env.MONGO_URI)
 // Trending endpoint
 app.get("/trending", async (req, res) => {
   try {
-    const movies = await Movie.find().sort({ count: -1 });
+    const movies = await Movie.find().sort({ updatedAt: -1 }).limit(15);
     res.json(movies);
   } catch (err) {
     res.status(500).json({ error: err.message });
@@ -46,7 +46,7 @@ app.get("/movies", async (req, res) => {
 // Search endpoint
 app.post("/search", async (req, res) => {
   try {
-    const { movieID, title, poster_url,movieType } = req.body;
+    const { movieID, title, poster_url,typeMovie } = req.body;
     if (!movieID || !title) return res.status(400).json({ error: "Invalid movie data" });
 
     const existingMovie = await Movie.findOne({ movieID });
@@ -56,7 +56,7 @@ app.post("/search", async (req, res) => {
       return res.json(existingMovie);
     }
 
-    const newMovie = await Movie.create({ movieID,movieType, title, poster_url, count: 1 });
+    const newMovie = await Movie.create({ movieID,typeMovie, title, poster_url, count: 1 });
     res.json(newMovie);
   } catch (error) {
     console.error("SEARCH ERROR:", error);

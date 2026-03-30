@@ -20,7 +20,7 @@ export default function MovieLoader({
   const isTablet = width > 600;
 
   return (
-    <TouchableOpacity style={{ width: "100%" , marginLeft:15}}>
+    <TouchableOpacity style={{ width: "100%" , marginLeft:6}}>
       <Link
         href={{
           pathname: "/movies/[id]",

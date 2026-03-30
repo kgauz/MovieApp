@@ -51,7 +51,7 @@ export default function Search() {
           ? `https://image.tmdb.org/t/p/w500${m.poster_url}`
           : null,
         backdrop_path: null,
-        media_type: m.mediaType,
+        typeMovie: m.typeMovie,
         adult: false,
         genre_ids: [],
         original_language: "en",
@@ -63,6 +63,7 @@ export default function Search() {
         vote_average: 0,
         vote_count: 0,
       }));
+     
 
       setTrending(mapped);
     } catch (err) {
@@ -73,6 +74,8 @@ export default function Search() {
 
   getTrending();
 }, []);
+
+console.error(trending);
 
   
   useEffect(() => {

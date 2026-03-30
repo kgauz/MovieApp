@@ -245,7 +245,7 @@ export default function MoviesOnly() {
               </View>
             )}
 
-            <View style={{ position: "relative" }}>
+            <View style={{ flex:1}}>
                 {/* Trending movie this week TV */}
                 <Text style={{ color: "#fff", margin: 10, marginTop: 20,  fontSize:20 }}>
                   Trending movie this week
@@ -264,25 +264,12 @@ export default function MoviesOnly() {
                     </View>
                   )}
                 />
-                 <Ionicons
-                name="chevron-forward"
-                size={28}
-                color="#fff"
-                
-                style={{
-                  position: "absolute",
-                  right:0,
-                  top: "50%",
-                  transform: [{ translateY: -14 }],
-                  opacity: 0.7,
-                  backgroundColor:"#000"
-                }}
-              />
+                 
             
               </View>
 
 
-              <View style={{ position: "relative" }}>
+              <View style={{ flex:1 }}>
                 {/* Latest Movies */}
                 <Text style={{ color: "#fff", margin: 10, marginTop: 20,  fontSize:20 }}>
                   Popular Movies
@@ -300,24 +287,11 @@ export default function MoviesOnly() {
                   )}
                 />
             
-                  <Ionicons
-                name="chevron-forward"
-                size={28}
-                color="#fff"
-                
-                style={{
-                  position: "absolute",
-                  right:0,
-                  top: "50%",
-                  transform: [{ translateY: -14 }],
-                  opacity: 0.7,
-                  backgroundColor:"#000"
-                }}
-              />
+                  
                 </View>
           
             
-              <View style={{ position: "relative" }}>
+              <View style={{ flex:1}}>
                  <Text style={{ color: "#fff", margin: 10, marginTop: 20 ,  fontSize:20}}>
                   Top Rated Movies
                 </Text>
@@ -333,23 +307,10 @@ export default function MoviesOnly() {
                     </View>
                   )}
                 />
-                <Ionicons
-                name="chevron-forward"
-                size={28}
-                color="#fff"
-                
-                style={{
-                  position: "absolute",
-                  right:0,
-                  top: "50%",
-                  transform: [{ translateY: -14 }],
-                  opacity: 0.7,
-                  backgroundColor:"#000"
-                }}
-              />
+              
                 </View>
 
-              <View style={{ position: "relative" }}>
+              <View style={{ flex:1 }}>
                 <Text style={{ color: "#fff", margin: 10, marginTop: 20,  fontSize:20 }}>
                   Now Playing Movies
                 </Text>
@@ -365,20 +326,7 @@ export default function MoviesOnly() {
                     </View>
                   )}
                 />
-                 <Ionicons
-                name="chevron-forward"
-                size={28}
-                color="#fff"
                 
-                style={{
-                  position: "absolute",
-                  right:0,
-                  top: "50%",
-                  transform: [{ translateY: -14 }],
-                  opacity: 0.7,
-                  backgroundColor:"#000"
-                }}
-              />
                 </View>
 
                 <BackArrow/>
