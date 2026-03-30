@@ -476,8 +476,6 @@ useFocusEffect(
 
 
 
-
-<View style={{ flex:1 }}>
       {recent?.length > 0 && (
   <>
     <Text style={{ color: "#fff", margin: 10, marginTop: 20, fontSize:20 }}>
@@ -501,7 +499,7 @@ useFocusEffect(
 
   </>
 )}
-</View>
+
 
 <View style={{ flex:1 }}>
     {/* Trending movie this week TV */}
