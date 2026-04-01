@@ -22,20 +22,6 @@ mongoose.connect(process.env.MONGO_URI)
   .catch(err => console.error(err));
 
 
-async function addTypeMovieField() {
-
-  await Movie.deleteMany({});
-  
-
-
-}
-
-mongoose.connect(process.env.MONGO_URI)
-  .then(async () => {
-    console.log("MongoDB connected");
-    await addTypeMovieField(); 
-  })
-  .catch(err => console.error(err));
 
 // Trending endpoint
 app.get("/trending", async (req, res) => {
