@@ -50,7 +50,12 @@ addTypeMovieField();
 app.get("/trending", async (req, res) => {
   try {
     const movies = await Movie.find().sort({ updatedAt: -1 }).limit(15);
-    res.json(movies);
+     const safeMovies = movies.map(m => ({
+      ...m.toObject(),
+      typeMovie: m.typeMovie || "movie", 
+    }));
+    res.json(safeMovies);
+    
   } catch (err) {
     res.status(500).json({ error: err.message });
   }
