@@ -8,7 +8,6 @@ import jwt from "jsonwebtoken";
 import { auth } from "./middleware.js";
 
 
-
 dotenv.config();
 
 const app = express();
@@ -21,6 +20,34 @@ app.use(express.json());
 mongoose.connect(process.env.MONGO_URI)
   .then(() => console.log("MongoDB connected"))
   .catch(err => console.error(err));
+
+
+
+async function fixTypeMovie() {
+  await mongoose.connect(process.env.MONGO_URI); // replace with your URI
+
+  // Find all movies where typeMovie is missing or incorrectly set
+  const movies = await UserList.find({ $or: [{ typeMovie: { $exists: false } }, { typeMovie: "movie" }] });
+
+  let fixedCount = 0;
+
+  for (let m of movies) {
+    // If releaseDate exists -> it's a movie, else tv (series)
+    let inferredType = m.releaseDate ? "movie" : "tv";
+
+    // Only update if the inferred type differs from stored typeMovie
+    if (m.typeMovie !== inferredType) {
+      m.typeMovie = inferredType;
+      await m.save();
+      fixedCount++;
+    }
+  }
+
+  console.log(`Fixed ${fixedCount} entries.`);
+  mongoose.disconnect();
+}
+
+fixTypeMovie();
 
 // Trending endpoint
 app.get("/trending", async (req, res) => {
@@ -47,6 +74,10 @@ app.get("/movies", async (req, res) => {
 app.post("/search", async (req, res) => {
   try {
     const { movieID, title, poster_url,typeMovie } = req.body;
+
+    console.log(typeMovie);
+    console.error(typeMovie);
+
     if (!movieID || !title) return res.status(400).json({ error: "Invalid movie data" });
 
     const existingMovie = await Movie.findOne({ movieID });
@@ -196,7 +227,7 @@ app.post("/save-movie", auth, async (req, res) => {
     const newEntry = new UserList({
       userID,
       movieID: movie.id,
-      typeMovie: "movie" || "tv",
+      typeMovie: movie.movie_type || movie.media_type || "movie",
       title: movie.title,
       poster:  movie.poster_path ? `${baseURL}${movie.poster_path}` : movie.poster,
       releaseDate: movie.release_date || movie.releaseDate,

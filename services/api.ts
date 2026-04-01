@@ -43,7 +43,7 @@ const useFetchMovies = async ({ query }: { query: string }) => {
   release_date: item.release_date || item.first_air_date,
   vote_average: item.vote_average,
   overview: item.overview,
-  movie_type: item.media_type, 
+  movie_type: item.media_type || (item.first_air_date ? "tv" : "movie"), 
 }));
 };
 

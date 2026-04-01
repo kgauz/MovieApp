@@ -59,7 +59,7 @@ type RecentItem = {
  let marginForRecent = 20;
  const [showArrow, setShowArrow] = useState(true);
  const [recent, setRecent] = useState<RecentItem[]>([]);
-const cardWidth = (width - spacing * (columns + 1)) / columns;
+ const cardWidth = (width - spacing * (columns + 1)) / columns;
 
 const marginleft = width > 900 ? 100 : 0;
 const isTablet = width >= 768;

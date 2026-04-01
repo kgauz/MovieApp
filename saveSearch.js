@@ -7,7 +7,7 @@ export default async function saveSearchToDB(movie) {
         movieID: movie.id,
         title: movie.title,
         poster_url: movie.poster_path,
-        typeMovie:movie.media_type,
+        typeMovie:movie.movie_type,
       }),
     });
 

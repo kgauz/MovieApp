@@ -75,7 +75,7 @@ export default function Search() {
   getTrending();
 }, []);
 
-console.error(trending);
+console.error("trending",trending);
 
   
   useEffect(() => {
