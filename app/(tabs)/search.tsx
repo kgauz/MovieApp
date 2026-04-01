@@ -1,8 +1,11 @@
-import TrendingMovies from "@/trendingMovies";
-import fetchMovies from "@/services/api";
-import useFetch from "@/services/useFech";
 import saveSearchToDB from "@/saveSearch";
-import React, { useState, useEffect } from "react";
+import fetchMovies from "@/services/api";
+import fetchTrending from "@/services/fetchTrending";
+import useFetch from "@/services/useFech";
+import TrendingMovies from "@/trendingMovies";
+import { Ionicons } from "@expo/vector-icons";
+import { LinearGradient } from "expo-linear-gradient";
+import React, { useEffect, useState } from "react";
 import {
   ActivityIndicator,
   FlatList,
@@ -12,9 +15,6 @@ import {
   View,
 } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
-import { LinearGradient } from "expo-linear-gradient";
-import { Ionicons } from "@expo/vector-icons";
-import fetchTrending from "@/services/fetchTrending"
 
 export default function Search() {
   const [searchText, setSearchText] = useState("");
@@ -51,7 +51,7 @@ export default function Search() {
           ? `https://image.tmdb.org/t/p/w500${m.poster_url}`
           : null,
         backdrop_path: null,
-        typeMovie: m.typeMovie,
+        movie_type: m.typeMovie,
         adult: false,
         genre_ids: [],
         original_language: "en",
