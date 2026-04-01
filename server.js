@@ -23,28 +23,19 @@ mongoose.connect(process.env.MONGO_URI)
 
 
 async function addTypeMovieField() {
-  await mongoose.connect(process.env.MONGO_URI);
+
+  await Movie.deleteMany({});
+  
 
 
-  // Find movies that don't have typeMovie
-  const movies = await Movie.find({ typeMovie: { $exists: false } });
-
-  let fixedCount = 0;
-
-  for (let m of movies) {
-    // Infer type: release_date exists -> movie, else tv
-    const inferredType = m.release_date ? "movie" : "tv";
-    m.typeMovie = inferredType;
-    await m.save();
-    fixedCount++;
-  }
-
-
-  console.log(`fixed ${fixedCount} documents`);
-  mongoose.disconnect();
 }
 
-addTypeMovieField();
+mongoose.connect(process.env.MONGO_URI)
+  .then(async () => {
+    console.log("MongoDB connected");
+    await addTypeMovieField(); 
+  })
+  .catch(err => console.error(err));
 
 // Trending endpoint
 app.get("/trending", async (req, res) => {
@@ -55,7 +46,7 @@ app.get("/trending", async (req, res) => {
       typeMovie: m.typeMovie || "movie", 
     }));
     res.json(safeMovies);
-    
+
   } catch (err) {
     res.status(500).json({ error: err.message });
   }
