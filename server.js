@@ -22,32 +22,29 @@ mongoose.connect(process.env.MONGO_URI)
   .catch(err => console.error(err));
 
 
+async function addTypeMovieField() {
+  await mongoose.connect(process.env.MONGO_URI);
 
-async function fixTypeMovie() {
-  await mongoose.connect(process.env.MONGO_URI); // replace with your URI
 
-  // Find all movies where typeMovie is missing or incorrectly set
-  const movies = await UserList.find({ $or: [{ typeMovie: { $exists: false } }, { typeMovie: "movie" }] });
+  // Find movies that don't have typeMovie
+  const movies = await Movie.find({ typeMovie: { $exists: false } });
 
   let fixedCount = 0;
 
   for (let m of movies) {
-    // If releaseDate exists -> it's a movie, else tv (series)
-    let inferredType = m.releaseDate ? "movie" : "tv";
-
-    // Only update if the inferred type differs from stored typeMovie
-    if (m.typeMovie !== inferredType) {
-      m.typeMovie = inferredType;
-      await m.save();
-      fixedCount++;
-    }
+    // Infer type: release_date exists -> movie, else tv
+    const inferredType = m.release_date ? "movie" : "tv";
+    m.typeMovie = inferredType;
+    await m.save();
+    fixedCount++;
   }
 
-  console.log(`Fixed ${fixedCount} entries.`);
+
+  console.log(`fixed ${fixedCount} documents`);
   mongoose.disconnect();
 }
 
-fixTypeMovie();
+addTypeMovieField();
 
 // Trending endpoint
 app.get("/trending", async (req, res) => {
