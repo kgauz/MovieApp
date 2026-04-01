@@ -227,7 +227,7 @@ app.post("/save-movie", auth, async (req, res) => {
     const newEntry = new UserList({
       userID,
       movieID: movie.id,
-      typeMovie: movie.movie_type || movie.media_type || "movie",
+      typeMovie: movie.movie_type || movie.media_type || (movie.release_date ? "movie" : "tv"),
       title: movie.title,
       poster:  movie.poster_path ? `${baseURL}${movie.poster_path}` : movie.poster,
       releaseDate: movie.release_date || movie.releaseDate,

@@ -12,7 +12,7 @@ const movieSchema = new mongoose.Schema(
       required: true,
     },
     poster_url: {
-      type: String, // URL stored as string
+      type: String, 
     },
     searchText: {
       type: String,
@@ -21,6 +21,10 @@ const movieSchema = new mongoose.Schema(
     count: {
       type: Number,
       default: 0, // starts from zero
+    },
+     typeMovie: {          
+      type: String,
+      default: "movie",   
     },
   },
   { timestamps: true }
