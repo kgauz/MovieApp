@@ -1,15 +1,17 @@
-import { Tabs } from "expo-router"
+import { Tabs,  useRouter, usePathname  } from "expo-router"
 import { Ionicons } from "@expo/vector-icons";
-import { TextInput, View ,Image, } from "react-native"
+import { TextInput, View ,Image,  Text, Pressable} from "react-native"
 
 import { useSafeAreaInsets } from "react-native-safe-area-context";
+import { useWindowDimensions } from "react-native";
 
-export default function TabsLayout() {
+
+function MobileTabs() {
   const insets = useSafeAreaInsets();
-  
+
   return (
     <Tabs
-        screenOptions={{
+     screenOptions={{
         headerShown: false,
 
         //  Floating rounded tab bar
@@ -52,13 +54,9 @@ export default function TabsLayout() {
         
         },
 
-
-        // 🔵 Active circular tab
     
         tabBarActiveTintColor: "#8967fe",
       
-
-       
 
         tabBarLabelStyle: {
           fontSize: 12,
@@ -67,7 +65,7 @@ export default function TabsLayout() {
 
         },
       }}
-        >
+    >
       <Tabs.Screen name="home" options={{ title: 'home',  headerShown: false,
          tabBarIcon: ({ color,focused }) => (
 
@@ -108,3 +106,111 @@ export default function TabsLayout() {
     </Tabs>
   );
 }
+
+ function DesktopLayout() {
+  const router = useRouter();
+  const pathname = usePathname();
+
+const {width} = useWindowDimensions();
+const isTablet = width >= 768;
+
+  const navItems = [
+    { name: "home", icon: "home-outline", route: "/home" },
+    { name: "search", icon: "search-outline", route: "/search" },
+    { name: "saved", icon: "bookmark-outline", route: "/saved" },
+    { name: "profile", icon: "person-outline", route: "/profile" },
+  ];
+
+  return (
+    <View style={{ flex: 1, flexDirection: "row" }}>
+      
+      <View
+        style={{
+          width: 240,
+          backgroundColor: "#0f0f28",
+          paddingTop: 5,
+          paddingHorizontal: 20,
+          justifyContent: "space-between",
+          height:"100%",
+          position:"relative"
+        }}
+      >
+        <View>
+          <Text
+            style={{
+              color: "#8967fe",
+              fontSize: 22,
+              fontWeight: "bold",
+            }}
+          >
+            <Image
+                   source={require("@/assets/images/log.png")}
+                   style={{    width: isTablet ? 140 : 110,
+                 height: isTablet ? 120 : 100,}}
+                   resizeMode="contain"
+                 />
+          </Text>
+          {navItems.map((item) => {
+            const isActive = pathname === item.route;
+
+            return (
+              <Pressable
+                key={item.name}
+                onPress={() => router.push(item.route)}
+                style={{
+                  flexDirection: "row",
+                  alignItems: "center",
+                  padding: 12,
+                  borderRadius: 12,
+                  marginBottom: 12,
+                  backgroundColor: isActive ? "rgba(137,103,254,0.15)" : "transparent",
+                }}
+              >
+                <Ionicons
+                  name={item.icon}
+                  size={22}
+                  color={isActive ? "#8967fe" : "white"}
+                />
+                <Text
+                  style={{
+                    color: isActive ? "#8967fe" : "white",
+                    marginLeft: 12,
+                    fontSize: 16,
+                    fontWeight: "500",
+                    textTransform: "capitalize",
+                  }}
+                >
+                  {item.name}
+                </Text>
+              </Pressable>
+            );
+          })}
+        </View>
+
+        {/* Bottom Section (Profile / Footer) */}
+        <View style={{ marginBottom: 20 }}>
+          <Text style={{ color: "gray", fontSize: 12 }}>
+            © 2026 MovieApp
+          </Text>
+        </View>
+      </View>
+
+      <View style={{ flex: 1 }}>
+        <Tabs
+          screenOptions={{
+            headerShown: false,
+            tabBarStyle: { display: "none" }, // hide mobile tabs
+          }}
+        />
+      </View>
+    </View>
+  );
+}
+
+export default function TabsLayout() {
+  const { width } = useWindowDimensions();
+  const isDesktop = width >= 1024;
+
+  return isDesktop ? <DesktopLayout /> : <MobileTabs />;
+}
+

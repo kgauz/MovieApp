@@ -12,15 +12,20 @@ export default function MovieLoader({
   movie_type,
 }: Movie & { poster?: string }) {
   const imageURL =
-    poster ||
-    (poster_path ? `https://image.tmdb.org/t/p/w500${poster_path}` : null);
-  console.log(imageURL);
+    poster ? `https://image.tmdb.org/t/p/w780${poster}`
+     : poster_path ?
+    `https://image.tmdb.org/t/p/w500${poster_path}` 
+    : null;
+
   const { width } = useWindowDimensions();
 
   const isTablet = width > 600;
+   const isDesktop = width >= 1024;
+   const marginleft = width >= 1024 ? 20 : 6;
+  const desktopFontSize = width >= 1024 ? 15 : 10;
 
   return (
-    <TouchableOpacity style={{ width: "100%" , marginLeft:6}}>
+    <TouchableOpacity style={{ width: "100%" , marginLeft:marginleft}}>
       <Link
         href={{
           pathname: "/movies/[id]",
@@ -37,13 +42,15 @@ export default function MovieLoader({
               uri: imageURL,
             }}
             style={[
-              { width: "100%", borderRadius: 6 },
-              isTablet
-                ? { aspectRatio: 2 / 3 } // Tablet
-                : { height: 180 }, // Phone
-            ]}
-            resizeMode="cover"
-          />
+              { width: "100%", borderRadius: 8 },
+              isDesktop
+                ? { height: 260 } 
+                : isTablet
+                ? { aspectRatio: 2 / 3 }
+                : { height: 180 },
+                      ]}
+                      resizeMode="cover"
+                    />
         ) : (
           <View
             style={[
@@ -55,7 +62,7 @@ export default function MovieLoader({
               },
               isTablet
                 ? { aspectRatio: 2 / 3 } // Tablet
-                : { height: 170 },
+                : { height: 180 },
             ]}
           >
             <Text style={{ color: "#9ca3af", fontSize: 12 }}>No Image</Text>
@@ -63,13 +70,13 @@ export default function MovieLoader({
         )}
       </Link>
       <Text
-        style={{ color: "#fff", fontSize: 10, marginTop: 5 }}
+        style={{ color: "#fff", fontSize: desktopFontSize, marginTop: 5 }}
         numberOfLines={1}
         ellipsizeMode="tail"
       >
         {title}
       </Text>
-      <Text style={{ color: "#fff", fontSize: 10 }}>
+      <Text style={{ color: "#fff", fontSize: desktopFontSize }}>
         {release_date ? new Date(release_date).getFullYear() : ""}
       </Text>
 

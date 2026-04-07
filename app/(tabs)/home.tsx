@@ -24,6 +24,11 @@ import { BottomTabBar } from "@react-navigation/bottom-tabs";
 import { TouchableOpacity } from "react-native";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import { useFocusEffect } from "@react-navigation/native";
+import { Animated } from "react-native";
+import HorizontalArrows from "../horizontalArrows";
+import HorizontalSection from "../horizontalSection";
+
+
 export default function Home() {
  
 
@@ -49,40 +54,42 @@ type RecentItem = {
   const router = useRouter();
   const [popularTvSeries, setPopularTvSeries] = useState<TVShow[]>([]);
   const [trendingMoviethisWeek, setTrendingMoviethisWeek] = useState<Movie[]>([]);
-   const [trendingTvSeriesthisWeek, setTrendingTvSeriesthisWeek] = useState<TVShow[]>([]);
+  const [trendingTvSeriesthisWeek, setTrendingTvSeriesthisWeek] = useState<TVShow[]>([]);
   const [topRatedMovie, setTopratedMovie] = useState<Movie[]>([]);
-   const [topRatedSeries, setTopRatedSeries] = useState<TVShow[]>([]);
-  const spacing = 10; // horizontal margin between cards
+  const [topRatedSeries, setTopRatedSeries] = useState<TVShow[]>([]);
+  const spacing = 10; 
   const columns = width > 900 ? 6 : width > 600 ? 5 : 3;
   const [upcomingMovie, setUpcomingMovie] = useState<Movie[]>([]);
- const [ontheairSeries, setOntheAirSeries] = useState<TVShow[]>([]);
+  const [ontheairSeries, setOntheAirSeries] = useState<TVShow[]>([]);
  let marginForRecent = 20;
  const [showArrow, setShowArrow] = useState(true);
  const [recent, setRecent] = useState<RecentItem[]>([]);
- const cardWidth = (width - spacing * (columns + 1)) / columns;
+//  const cardWidth = (width - spacing * (columns + 1)) 
 
-const marginleft = width > 900 ? 100 : 0;
 const isTablet = width >= 768;
 const topText = width > 600 ? "10%" : "30%";
 const heightImg =  width > 600 ? 102 : 85;
 const navBarTop  = width > 600 ? 40 : 30;
 
-    const heroHeight =
-  width >= 1280 // Large Desktop (PC)
-    ? height * 0.97
-    : width >= 1024 // Small Desktop / Laptop
-    ? height * 0.60
-    : width >= 768 // Tablet
-    ? height * 0.60
-    : height * 0.55; // Mobile
+const isDesktop = width >= 1024; 
+const cardWidth = isDesktop ? 180 : (width - spacing * (columns + 1)) / columns;
+const marginleft = isDesktop ? 100 : 0
+const [hovered, setHovered] = useState(false);
+const heroHeight =
+  width >= 1280 ? height * 0.97 : 
+  width >= 1024 ? height * 0.6 :  
+  width >= 768 ? height * 0.6 :   
+  height * 0.55;                   
 
   const {
     data: movies,
     loading: moviesLoading,
     error: moviesError,
   } = useFetch(() => fetchMovies({ query: "" }));
-  
   const [trending, setTrending] = useState<Movie[]>([]);
+  const listRef = React.useRef<FlatList>(null);
+  const [currentOffset, setCurrentOffset] = useState(0);
+  const scrollAmount = cardWidth * 3; 
 
 
 
@@ -152,7 +159,7 @@ const navBarTop  = width > 600 ? 40 : 30;
   }, []);
 
 
-    const featuredMovie = movies?.find(item => item?.backdrop_path) || 
+     const featuredMovie = movies?.find(item => item?.backdrop_path) || 
       movies?.[0];
    const imageUrl = featuredMovie?.backdrop_path?.startsWith("http")
   ? featuredMovie.backdrop_path
@@ -204,7 +211,73 @@ useFocusEffect(
     fetchRecentMovies();
   }, [])
 );
+const HoverableCard = ({ item, cardWidth, spacing }: any) => {
+  const scale = React.useRef(new Animated.Value(1)).current;
+  const elevation = React.useRef(new Animated.Value(2)).current;
 
+  const onHoverIn = () => {
+    Animated.parallel([
+      Animated.spring(scale, {
+        toValue: 1.05, // subtle zoom
+        useNativeDriver: true,
+      }),
+      Animated.timing(elevation, {
+        toValue: 8,
+        duration: 200,
+        useNativeDriver: false,
+      }),
+    ]).start();
+  };
+
+  const onHoverOut = () => {
+    Animated.parallel([
+      Animated.spring(scale, {
+        toValue: 1,
+        useNativeDriver: true,
+      }),
+      Animated.timing(elevation, {
+        toValue: 2,
+        duration: 200,
+        useNativeDriver: false,
+      }),
+    ]).start();
+  };
+
+  return (
+    <Animated.View
+      style={{
+        width: cardWidth,
+        marginRight: spacing,
+        transform: [{ scale }],
+        elevation, 
+        shadowColor: "#000",
+        shadowOpacity: 0.3,
+        shadowRadius: elevation,
+        shadowOffset: { width: 0, height: elevation },
+        borderRadius: 10,
+       
+      }}
+      onMouseEnter={isDesktop ? onHoverIn : undefined}
+      onMouseLeave={isDesktop ? onHoverOut : undefined}
+    >
+      <MovieLoader {...item} />
+    </Animated.View>
+  );
+};
+
+const scrollLeft = () => {
+  listRef.current?.scrollToOffset({
+    offset: Math.max(currentOffset - scrollAmount, 0),
+    animated: true,
+  });
+};
+
+const scrollRight = () => {
+  listRef.current?.scrollToOffset({
+    offset: currentOffset + scrollAmount,
+    animated: true,
+  });
+};
 
   return (
 
@@ -237,450 +310,400 @@ useFocusEffect(
         <ScrollView showsVerticalScrollIndicator={false}
       >
     
-    {/* Logo */}
-    { <View style={{ flex:1,alignItems: "flex-start", marginLeft:marginleft , marginBottom:0, maxHeight:heightImg, flexDirection:"row", alignSelf:"flex-start"}}>
-      <Image
-        source={require("@/assets/images/log.png")}
-        style={{    width: isTablet ? 140 : 110,
-      height: isTablet ? 120 : 100,}}
-        resizeMode="contain"
-      />
-     <View style={{marginTop:navBarTop ,alignSelf:"flex-start", flexDirection:"row", columnGap: isTablet ? 20 : 10, }}>
+  
+   
+{!isDesktop && (
+  <View
+    style={{
+      flex: 1,
+      alignItems: "flex-start",
+      marginLeft: marginleft,
+      marginBottom: 0,
+      maxHeight: heightImg,
+      flexDirection: "row",
+      alignSelf: "flex-start",
+    }}
+  >
+
+    <Image
+      source={require("@/assets/images/log.png")}
+      style={{
+        width: isTablet ? 140 : 110,
+        height: isTablet ? 120 : 100,
+      }}
+      resizeMode="contain"
+    />
+    <View
+      style={{
+        marginTop: navBarTop,
+        alignSelf: "flex-start",
+        flexDirection: "row",
+        columnGap: isTablet ? 20 : 10,
+      }}
+    >
       <TouchableOpacity
-       onPress={() => router.replace("/")}
-          style={{
-            borderRadius: 15,
-            padding:10,
-             backgroundColor: "#8b5cf6" ,
-            
-            
-          }}
-        >
-          <Text style={{ color: "#fff"  }}>
-            All
-          </Text>
-        </TouchableOpacity>
-         <TouchableOpacity
-             onPress={() => router.push("/moviesOnly")}
-          style={{
-              backgroundColor:  "#fff",
-            borderRadius: 15,
-            padding:10,
-            
-          }}
-        >
-          <Text >
-            Movies
-          </Text>
-        </TouchableOpacity>
-         <TouchableOpacity
-           onPress={() => router.push("/seriesOnly")}
-          style={{
-             backgroundColor: "#fff",
-            borderRadius: 15,
-            padding:10,
-            
-          }}
-        >
-          <Text>
-            Series
-          </Text>
-        </TouchableOpacity>
+        onPress={() => router.replace("/")}
+        style={{
+          borderRadius: 15,
+          padding: 10,
+          backgroundColor: "#8b5cf6",
+        }}
+      >
+        <Text style={{ color: "#fff" }}>All</Text>
+      </TouchableOpacity>
 
-        </View>
+      <TouchableOpacity
+        onPress={() => router.push("/moviesOnly")}
+        style={{
+          backgroundColor: "#fff",
+          borderRadius: 15,
+          padding: 10,
+        }}
+      >
+        <Text>Movies</Text>
+      </TouchableOpacity>
 
-
+      <TouchableOpacity
+        onPress={() => router.push("/seriesOnly")}
+        style={{
+          backgroundColor: "#fff",
+          borderRadius: 15,
+          padding: 10,
+        }}
+      >
+        <Text>Series</Text>
+      </TouchableOpacity>
     </View>
-     }
+  </View>
+)}
 
 
 {featuredMovie && (
-  <View style={{ width: "100%", height: heroHeight, minHeight: 320,maxHeight: 5000, position: "relative" , overflow:"hidden"}}>
-
-    {/* Background Image */}
+  <View
+    style={{
+      width: "100%",
+      height: isDesktop ? 600 : heroHeight, 
+      position: "relative",
+      overflow: "hidden",
+    }}
+  >
+  
     <Image
-               source={{ uri: imageUrl }}
-               style={{
-                 width: "100%",
-                 height: "100%",
-                 position: "absolute",
-               }}
-               resizeMode="cover"
-             />
-   
-             <LinearGradient
-               colors={[
-                 "rgba(0,0,0,0.2)",
-                 "rgba(0,0,0,0.5)",
-                 "rgba(0,0,0,0.9)"
-               ]}
-               locations={[0, 0.6, 1]}
-               style={{
-                 position: "absolute",
-                 width: "100%",
-                 height: "100%",
-               }}
-             />
-   
-             <LinearGradient
-               colors={[
-                 "transparent",
-                 "rgb(15,15,30)"
-               ]}
-               locations={[0.7, 1]}
-               style={{
-                 position: "absolute",
-                 bottom: 0,
-                 width: "100%",
-                 height: 120,
-               }}
-             />
+      source={{ uri: imageUrl }}
+      style={{
+        width: "100%",
+        height: "100%",
+        position: "absolute",
+        opacity: 0.9,
+      }}
+      resizeMode="cover"
+    />
 
-
-    {/*  MOVIE INFO  */}
-    <View
+    <LinearGradient
+      colors={["rgba(0,0,0,0.1)", "rgba(0,0,0,0.6)", "rgba(0,0,0,0.95)"]}
+      locations={[0, 0.5, 1]}
       style={{
         position: "absolute",
         width: "100%",
-        paddingHorizontal: 16,
-        top:topText,
-        bottom:120,
-        justifyContent:"center",
-        
+        height: "100%",
+      }}
+    />
+
+  
+    <View
+      style={{
+        position: "absolute",
+        left: isDesktop ? 100 : 20, 
+        bottom: 60,
+        maxWidth: isDesktop ? 600 : "90%",
       }}
     >
-
-      {/* Movie Title */}
+     
       <Text
         style={{
           color: "#fff",
-          fontSize: 28,
+          fontSize: isDesktop ? 48 : 28,
           fontWeight: "bold",
-          marginBottom: 10,
+          marginBottom: 16,
         }}
         numberOfLines={2}
       >
         {featuredMovie.title || featuredMovie.name}
       </Text>
 
-      {/* Genre / Info Row */}
+      
       <Text
         style={{
-          color: "rgba(255,255,255,0.8)",
-          fontSize: 14,
-          marginBottom: 16,
-          alignSelf:"flex-start",
-          maxWidth:500,
+          color: "rgba(255,255,255,0.85)",
+          fontSize: isDesktop ? 18 : 14,
+          marginBottom: 20,
+          lineHeight: isDesktop ? 26 : 20,
         }}
+        numberOfLines={3}
       >
         {featuredMovie.overview}
       </Text>
 
-      {/* Buttons Row */}
-      <View style={{ flexDirection: "row", alignItems: "center" }}>
-        
+      <View style={{ flexDirection: "row"}}>
         {/* Play Button */}
         <TouchableOpacity
-          onPress={() => {
-            router.push({
-              pathname: `/Watch/${featuredMovie?.id}`,
-              params: { type: featuredMovie?.movie_type },
-            });
+          onPress={() =>
+            router.push(`/Watch/${featuredMovie.id}?type=${featuredMovie.movie_type}`)
+          
           }
-        }
           style={{
             flexDirection: "row",
             alignItems: "center",
             backgroundColor: "#fff",
-            paddingVertical: 10,
-            paddingHorizontal: 20,
-            borderRadius: 6,
-            marginRight: 12,
-            height:40
+            paddingVertical: 12,
+            paddingHorizontal: 24,
+            borderRadius: 8,
+            shadowColor: "#000",
+            shadowOffset: { width: 0, height: 5 },
+            shadowOpacity: 0.3,
+            shadowRadius: 10,
+             marginRight: 12,
           }}
-
-          
         >
           <Ionicons name="play" size={20} color="#000" />
-          <Text
-            style={{
-              color: "#000",
-              fontWeight: "bold",
-              marginLeft: 6,
-              fontSize:15
-            }}
-          >
+          <Text style={{ color: "#000", fontWeight: "bold", marginLeft: 8, fontSize: 16 }}>
             Play
           </Text>
         </TouchableOpacity>
 
-        {/* My List Button */}
-       
-      <TouchableOpacity
-      // pathname: "/movies/[id]",
-        onPress={() => {
-            router.push({
-              pathname: `/movies/[id]`,
-              params: { id:featuredMovie?.id ,
-                type: featuredMovie?.movie_type },
-            });
-          }
-        }
-
-    style={{
-      flexDirection: "row",
-      alignItems: "center",
-      paddingVertical: 10,
-      paddingHorizontal: 16,
-      borderRadius: 8,
-      backgroundColor: "#e5e5e5", 
-      height:40,
-      
-    }}
-  >
-    {/* Icon Circle */}
-    <View
-      style={{
-        width: 28,
-        height: 28,
-        borderRadius: 14,
-        backgroundColor: "#fff", 
-        alignItems: "center",
-        justifyContent: "center",
-        marginRight: 8,
-      }}
-    >
-      <Ionicons name="information" size={20} color="#000" />
-    </View>
-
-    <Text
-      style={{
-        color: "#000",
-        fontWeight: "500",
-        fontSize:15
-      }}
-    >
-      More info
-    </Text>
-    </TouchableOpacity>
-
-  
-
+        <TouchableOpacity
+          onPress={() => 
+            { router.push({
+               pathname: "/movies/[id]",
+                params: { id:featuredMovie?.id , 
+                  type: featuredMovie?.movie_type }, }); }
+                }
+          style={{
+            flexDirection: "row",
+            alignItems: "center",
+            paddingVertical: 12,
+            paddingHorizontal: 20,
+            borderRadius: 8,
+            backgroundColor: "rgba(255,255,255,0.85)",
+          }}
+        >
+          <View
+            style={{
+              width: 28,
+              height: 28,
+              borderRadius: 14,
+              backgroundColor: "#fff",
+              alignItems: "center",
+              justifyContent: "center",
+              marginRight: 8,
+            }}
+          >
+            <Ionicons name="information" size={20} color="#000" />
+          </View>
+          <Text style={{ color: "#000", fontWeight: "500", fontSize: 16 }}>
+            More Info
+          </Text>
+        </TouchableOpacity>
       </View>
-
-      
     </View>
 
+   
   </View>
 )}
 
-
 <View style={{}}>
-      {recent?.length > 0 && (
+    {recent?.length > 0 && (
   <>
-    <Text style={{ color: "#fff", margin: 10, marginTop: 20, fontSize:20 }}>
-      Recently Played 
-    </Text>
 
-    <FlatList
-      horizontal
-      data={recent}
-      keyExtractor={(item) => item.id.toString()}
-      showsHorizontalScrollIndicator={false}
-      renderItem={({ item }) => (
-        <View style={{ marginRight: 10, width: cardWidth}}>
-          <MovieLoader {...item} />
-       
-        </View>
-
-      )}
+   <HorizontalSection
+  title="Recently Played"
+  data={recent}
+  cardWidth={cardWidth}
+  spacing={spacing}
+  isDesktop={isDesktop}
+  renderItem={({ item }) => (
+    <HoverableCard
+      item={item}
+      cardWidth={cardWidth}
+      spacing={spacing}
     />
-     
-
+  )}
+  />
+    
   </>
-)}
+  )}
 </View>
 
 
-    {/* Trending movie this week TV */}
   <View style={{}}>
-    <Text style={{ color: "#fff", margin: 10, marginTop: 20,  fontSize:20 }}>
-      Trending movie this week
-    </Text>
-
-    <FlatList
-      horizontal
-      data={trendingMoviethisWeek}
-      onEndReached={() => setShowArrow(false)}
-      onScrollBeginDrag={() => setShowArrow(true)}
-      keyExtractor={(item) => item.id.toString()}
-      showsHorizontalScrollIndicator={false}
-      renderItem={({ item }) => (
-        <View style={{ marginRight: 10, width: cardWidth }}>
-          <MovieLoader {...item} />
-        </View>
-      )}
+    <HorizontalSection
+  title="Trending movie this week"
+  data={trendingMoviethisWeek}
+  cardWidth={cardWidth}
+  spacing={spacing}
+  isDesktop={isDesktop}
+  renderItem={({ item }) => (
+    <HoverableCard
+      item={item}
+      cardWidth={cardWidth}
+      spacing={spacing}
     />
-    </View>
+  )}
+/>
+  
+  </View> 
 
-
-    {/* Trending series this week TV */}
     <View style={{}}>
-    <Text style={{ color: "#fff", margin: 10, marginTop: 20,  fontSize:20 }}>
-      Trending series this week
-    </Text>
-
-    <FlatList
-      horizontal
-      data={trendingTvSeriesthisWeek}
-      keyExtractor={(item) => item.id.toString()}
-      showsHorizontalScrollIndicator={false}
-      renderItem={({ item }) => (
-        <View style={{ marginRight: 10, width: cardWidth }}>
-          <MovieLoader {...item} />
-        </View>
-      )}
+      <HorizontalSection
+    title=" Trending series this week"
+    data={trendingTvSeriesthisWeek}
+    cardWidth={cardWidth}
+    spacing={spacing}
+    isDesktop={isDesktop}
+    renderItem={({ item }) => (
+      <HoverableCard
+      item={item}
+      cardWidth={cardWidth}
+      spacing={spacing}
     />
-    </View>
+  )}
+    />
+   
+  </View> 
      
- 
-    {/* Latest TV */}
     <View style={{}}> 
-    <Text style={{ color: "#fff", margin: 10, marginTop: 20,  fontSize:20 }}>
-      Latest TV Series
-    </Text>
-
-    <FlatList
-      horizontal
-      data={latestTV}
-      keyExtractor={(item) => item.id.toString()}
-      showsHorizontalScrollIndicator={false}
-      renderItem={({ item }) => (
-        <View style={{ marginRight: 10, width: cardWidth }}>
-          <MovieLoader {...item} />
-        </View>
-      )}
+          <HorizontalSection
+    title="Latest TV Series"
+    data={latestTV}
+    cardWidth={cardWidth}
+    spacing={spacing}
+    isDesktop={isDesktop}
+    renderItem={({ item }) => (
+      <HoverableCard
+      item={item}
+      cardWidth={cardWidth}
+      spacing={spacing}
     />
-    </View>
+  )}
+    />
+   
+  </View> 
 
-    
-    {/* Latest Movies */}
+   
     <View style={{}}>
-    <Text style={{ color: "#fff", margin: 10, marginTop: 20,  fontSize:20 }}>
-      Popular Movies
-    </Text>
 
-    <FlatList
-      horizontal
-      data={movies}
-      keyExtractor={(item) => item.id.toString()}
-      showsHorizontalScrollIndicator={false}
-      renderItem={({ item }) => (
-        <View style={{ marginRight: 10, width: cardWidth }}>
-          <MovieLoader {...item} />
-        </View>
-      )}
+    <HorizontalSection
+    title=" Popular Movies"
+    data={movies}
+    cardWidth={cardWidth}
+    spacing={spacing}
+    isDesktop={isDesktop}
+    renderItem={({ item }) => (
+      <HoverableCard
+      item={item}
+      cardWidth={cardWidth}
+      spacing={spacing}
     />
-   </View>
+  )}
+    />
+   
+   </View> 
 
 
    <View style={{}}>
-    <Text style={{ color: "#fff", margin: 10, marginTop: 20,  fontSize:20 }}>
-      Popular Series
-    </Text>
 
-    <FlatList
-      horizontal
-      data={popularTvSeries}
-      keyExtractor={(item) => item.id.toString()}
-      showsHorizontalScrollIndicator={false}
-      renderItem={({ item }) => (
-        <View style={{ marginRight: 10, width: cardWidth }}>
-          <MovieLoader {...item} />
-        </View>
-      )}
+    <HorizontalSection
+    title=" Popular Series "
+    data={popularTvSeries}
+    cardWidth={cardWidth}
+    spacing={spacing}
+    isDesktop={isDesktop}
+    renderItem={({ item }) => (
+      <HoverableCard
+      item={item}
+      cardWidth={cardWidth}
+      spacing={spacing}
     />
-    </View>
-
+  )}
+    />
     
-    <View style={{}}> 
-     <Text style={{ color: "#fff", margin: 10, marginTop: 20 ,  fontSize:20}}>
-      Top Rated Movies
-    </Text>
-
-    <FlatList
-      horizontal
-      data={topRatedMovie}
-      keyExtractor={(item) => item.id.toString()}
-      showsHorizontalScrollIndicator={false}
-      renderItem={({ item }) => (
-        <View style={{ marginRight: 10, width: cardWidth }}>
-          <MovieLoader {...item} />
-        </View>
-      )}
-    />
-  </View>
-
-  <View style={{}}>
-     <Text style={{ color: "#fff", margin: 10, marginTop: 20,  fontSize:20 }}>
-      Top Rated Series
-    </Text>
-
-
-    <FlatList
-      horizontal
-      data={topRatedSeries}
-      keyExtractor={(item) => item.id.toString()}
-      showsHorizontalScrollIndicator={false}
-      renderItem={({ item }) => (
-        <View style={{ marginRight: 10, width: cardWidth }}>
-          <MovieLoader {...item} />
-        </View>
-      )}
-    />
-    </View>
+  </View> 
   
-  <View style={{}}>
-    <Text style={{ color: "#fff", margin: 10, marginTop: 20,  fontSize:20 }}>
-      Now Playing Movies
-    </Text>
+    <View style={{}}> 
 
-    <FlatList
-      horizontal
-      data={upcomingMovie}
-      keyExtractor={(item) => item.id.toString()}
-      showsHorizontalScrollIndicator={false}
-      renderItem={({ item }) => (
-        <View style={{ marginRight: 10, width: cardWidth }}>
-          <MovieLoader {...item} />
-        </View>
-      )}
+      <HorizontalSection
+    title="Top Rated Movies"
+    data={topRatedMovie}
+    cardWidth={cardWidth}
+    spacing={spacing}
+    isDesktop={isDesktop}
+    renderItem={({ item }) => (
+      <HoverableCard
+      item={item}
+      cardWidth={cardWidth}
+      spacing={spacing}
     />
-  </View>
-    
+  )}
+  />
+     
+  </View> 
+
+  <View style={{}}>
+
+      <HorizontalSection
+    title="Top Rated Series"
+    data={topRatedSeries}
+    cardWidth={cardWidth}
+    spacing={spacing}
+    isDesktop={isDesktop}
+    renderItem={({ item }) => (
+      <HoverableCard
+      item={item}
+      cardWidth={cardWidth}
+      spacing={spacing}
+    />
+  )}
+  />
+     
+  </View> 
+   
+  <View style={{}}>
+      <HorizontalSection
+    title="Now Playing Movies"
+    data={upcomingMovie}
+    cardWidth={cardWidth}
+    spacing={spacing}
+    isDesktop={isDesktop}
+    renderItem={({ item }) => (
+      <HoverableCard
+      item={item}
+      cardWidth={cardWidth}
+      spacing={spacing}
+    />
+  )}
+  />
+   
+  </View> 
 
   <View style={{  marginBottom:90}}>
-    <Text style={{ color: "#fff", margin: 10, marginTop: 20,  fontSize:20 }}>
-      On The Air Series
-    </Text>
 
-    <FlatList
-      horizontal
-      data={ontheairSeries}
-      keyExtractor={(item) => item.id.toString()}
-      showsHorizontalScrollIndicator={false}
-      renderItem={({ item }) => (
-        <View style={{ marginRight: 10, width: cardWidth }}>
-          <MovieLoader {...item} />
-        </View>
-      )}
+      <HorizontalSection
+    title="On The Air Series"
+    data={ontheairSeries}
+    cardWidth={cardWidth}
+    spacing={spacing}
+    isDesktop={isDesktop}
+    renderItem={({ item }) => (
+      <HoverableCard
+      item={item}
+      cardWidth={cardWidth}
+      spacing={spacing}
     />
-     
-
+  )}
+  />
+    
     </View>
-
-
-
+     
 
 </ScrollView>
 

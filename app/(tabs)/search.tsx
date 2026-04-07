@@ -5,7 +5,7 @@ import useFetch from "@/services/useFech";
 import TrendingMovies from "@/trendingMovies";
 import { Ionicons } from "@expo/vector-icons";
 import { LinearGradient } from "expo-linear-gradient";
-import React, { useEffect, useState } from "react";
+import React, { useCallback, useEffect, useState } from "react";
 import {
   ActivityIndicator,
   FlatList,
@@ -15,11 +15,13 @@ import {
   View,
 } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
+import { useFocusEffect } from "expo-router";
 
 export default function Search() {
   const [searchText, setSearchText] = useState("");
   const [suggestions, setSuggestions] = useState([]);
   const [trending, setTrending] = useState([]);
+  const [loadingTrending, setLoadingTrending] = useState(true);
 
   const { width } = useWindowDimensions();
   const spacing = 10;
@@ -34,18 +36,58 @@ export default function Search() {
     reset,
   } = useFetch(() => fetchMovies({ query: searchText }), false);
 
-  //  Fetch Trending
 
-  useEffect(() => {
+//  useFocusEffect(
+//   useCallback(() => {
+//   const getTrending = async () => {
+//     try {
+
+//       const data = await  fetchTrending();
+
+//       if (!Array.isArray(data)) return;
+
+//       const mapped = data.map((m: any) => ({
+//         id: Number(m.movieID),
+//         title: m.title,
+//         poster_path: m.poster_url
+//           ? `https://image.tmdb.org/t/p/w500${m.poster_url}`
+//           : null,
+//         backdrop_path: null,
+//         movie_type: m.typeMovie,
+//         adult: false,
+//         genre_ids: [],
+//         original_language: "en",
+//         original_title: m.title,
+//         overview: "",
+//         popularity: m.count || 0,
+//         release_date: "",
+//         video: false,
+//         vote_average: 0,
+//         vote_count: 0,
+//       }));
+     
+
+//       setTrending(mapped);
+//     } catch (err) {
+//       console.log("Error fetching trending:", err);
+//       setTrending([]); 
+//     }
+//   };
+
+//   getTrending();
+// }, [])
+//  );
+
+useEffect(() => {
   const getTrending = async () => {
     try {
-
-      const data = await  fetchTrending();
+      setLoadingTrending(true);
+      const data = await fetchTrending();
 
       if (!Array.isArray(data)) return;
 
       const mapped = data.map((m: any) => ({
-        id: Number(m.movieID),
+         id: Number(m.movieID),
         title: m.title,
         poster_path: m.poster_url
           ? `https://image.tmdb.org/t/p/w500${m.poster_url}`
@@ -62,21 +104,19 @@ export default function Search() {
         video: false,
         vote_average: 0,
         vote_count: 0,
+        
       }));
-     
 
       setTrending(mapped);
+      setLoadingTrending(false);
     } catch (err) {
       console.log("Error fetching trending:", err);
-      setTrending([]); 
+      setTrending([]);
     }
   };
 
   getTrending();
 }, []);
-
-console.error("trending",trending);
-
   
   useEffect(() => {
     if (!searchText.trim()) {
@@ -103,7 +143,6 @@ console.error("trending",trending);
     return () => clearTimeout(timer);
   }, [searchText]);
 
-  // Save search
   useEffect(() => {
     if (movies?.length > 0) {
       saveSearchToDB(movies[0]);
@@ -162,7 +201,6 @@ console.error("trending",trending);
           )}
         </View>
 
-        {/* Suggestions */}
         {suggestions.length > 0 && (
           <View
             style={{
@@ -191,7 +229,6 @@ console.error("trending",trending);
           </View>
         )}
 
-        {/*  Title */}
         <Text
           style={{
             color: "#fff",
@@ -206,22 +243,25 @@ console.error("trending",trending);
             ? " Trending Now"
             : `Results for "${searchText}"`}
         </Text>
-
-        {/* Error */}
         {error && (
           <Text style={{ color: "red", marginLeft: 20 }}>
             {error.message}
           </Text>
         )}
 
-        {/*  Loader */}
         {loading ? (
           <ActivityIndicator
             size="large"
             color="#9b5cff"
             style={{ marginTop: 30 }}
           />
-        ) : (
+        ) : showTrending && loadingTrending ? (
+            <ActivityIndicator
+              size="large"
+              color="#9b5cff"
+              style={{ marginTop: 30 }}
+            />
+          )  : (
           <FlatList
             data={showTrending ? trending : movies}
             key={columns}
@@ -236,14 +276,15 @@ console.error("trending",trending);
             }}
             
             renderItem={({ item }) => (
-              <View style={{ width: cardWidth, margin: spacing/2 }}>
+              <View style={{ width: cardWidth, 
+                flex: 1,  marginHorizontal: 5,maxWidth: `${100 / columns}%`
+              }}>
                 <TrendingMovies{...item} />
               </View>
             )}
           />
         )}
 
-        {/* Empty state */}
         {!loading && !showTrending && movies?.length === 0 && (
           <View style={{ alignItems: "center" , justifyContent:"center"}}>
             <Ionicons name="film-outline" size={50} color="#666" />

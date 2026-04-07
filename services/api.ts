@@ -199,6 +199,7 @@ export const topRatedMovies= async () =>{
       release_date: item.release_date || item.first_air_date,
       vote_average: item.vote_average,
       movie_type: item.media_type, 
+      backdrop_path: item.backdrop_path,
     }));
 
      }

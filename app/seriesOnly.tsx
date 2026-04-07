@@ -52,6 +52,7 @@ export default function SeriesOnly() {
     : height * 0.55; // Mobile
   const heightImg =  width > 600 ? 102 : 85;
   const navBarTop  = width > 600 ? 40 : 30;
+  const isDesktop = width>= 1024;
 
   // Fetch data
   useEffect(() => {
@@ -78,7 +79,7 @@ export default function SeriesOnly() {
     fetchData();
   }, []);
 
-  // Featured series for hero image
+
    const featuredSeries =
   trendingTvSeriesthisWeek?.find(item => item?.backdrop_path) || 
   trendingTvSeriesthisWeek?.[0];
@@ -150,95 +151,107 @@ export default function SeriesOnly() {
             </View>
           </View>
 
-          {/* Featured Series Hero */}
+
+          
           {featuredSeries && (
-            <View style={{ width: "100%", height: heroHeight, minHeight: 320,maxHeight: 5000, position: "relative", marginTop: 0 }}>
-            {/* Background Image */}
-          <Image
-            source={{ uri: heroImageUrl }}
-            style={{
-              width: "100%",
-              height: "100%",
-              position: "absolute",
-            }}
-            resizeMode="cover"
-          />
-
-          <LinearGradient
-            colors={[
-              "rgba(0,0,0,0.2)",
-              "rgba(0,0,0,0.5)",
-              "rgba(0,0,0,0.9)"
-            ]}
-            locations={[0, 0.6, 1]}
-            style={{
-              position: "absolute",
-              width: "100%",
-              height: "100%",
-            }}
-          />
-
-          <LinearGradient
-            colors={[
-              "transparent",
-              "rgb(15,15,30)"
-            ]}
-            locations={[0.7, 1]}
-            style={{
-              position: "absolute",
-              bottom: 0,
-              width: "100%",
-              height: 120,
-            }}
-          />
-              <View style={{ position: "absolute", width: "100%",top:topText ,paddingHorizontal: 16, bottom: 120 , alignItems:"flex-start", justifyContent:"center"}}>
-                <Text style={{ color: "#fff", fontSize: 28, fontWeight: "bold", marginBottom: 10 }} numberOfLines={2}>
+            <View
+              style={{
+                width: "100%",
+                height: isDesktop ? 600 : heroHeight, 
+                position: "relative",
+                overflow: "hidden",
+              }}
+            >
+            
+              <Image
+                source={{ uri: heroImageUrl }}
+                style={{
+                  width: "100%",
+                  height: "100%",
+                  position: "absolute",
+                  opacity: 0.9,
+                }}
+                resizeMode="cover"
+              />
+          
+              <LinearGradient
+                colors={["rgba(0,0,0,0.1)", "rgba(0,0,0,0.6)", "rgba(0,0,0,0.95)"]}
+                locations={[0, 0.5, 1]}
+                style={{
+                  position: "absolute",
+                  width: "100%",
+                  height: "100%",
+                }}
+              />
+          
+            
+              <View
+                style={{
+                  position: "absolute",
+                  left: isDesktop ? 100 : 20, 
+                  bottom: 60,
+                  maxWidth: isDesktop ? 600 : "90%",
+                }}
+              >
+               
+                <Text
+                  style={{
+                    color: "#fff",
+                    fontSize: isDesktop ? 48 : 28,
+                    fontWeight: "bold",
+                    marginBottom: 16,
+                  }}
+                  numberOfLines={2}
+                >
                   {featuredSeries.title || featuredSeries.name}
                 </Text>
-                <Text style={{ color: "rgba(255,255,255,0.8)", fontSize: 14,maxWidth:500, marginBottom: 16 }}>
+          
+                
+                <Text
+                  style={{
+                    color: "rgba(255,255,255,0.85)",
+                    fontSize: isDesktop ? 18 : 14,
+                    marginBottom: 20,
+                    lineHeight: isDesktop ? 26 : 20,
+                  }}
+                  numberOfLines={3}
+                >
                   {featuredSeries.overview}
                 </Text>
-                <View style={{ flexDirection: "row", alignItems: "center" }}>
-                   <TouchableOpacity
-                            onPress={() => {
-                              if (!featuredSeries?.id) return;
-                              router.push({
-                                pathname: `/Watch/${featuredSeries?.id}`,
-                                params: { type: "tv" },
-                              });
-                            }
-                          }
-                            style={{
-                              flexDirection: "row",
-                              alignItems: "center",
-                              backgroundColor: "#fff",
-                              paddingVertical: 10,
-                              paddingHorizontal: 20,
-                              borderRadius: 6,
-                              marginRight: 12,
-                              height:40
-                            }}
-                  
-                            
-                          >
-                            <Ionicons name="play" size={20} color="#000" />
-                            <Text
-                              style={{
-                                color: "#000",
-                                fontWeight: "bold",
-                                marginLeft: 6,
-                                fontSize:15
-                              }}
-                            >
-                              Play
-                            </Text>
-                          </TouchableOpacity>
-                  
-                          {/* My List Button */}
-                         
-                        <TouchableOpacity
-                        // pathname: "/movies/[id]",
-                          onPress={() => {
+          
+                {/* Buttons */}
+                <View style={{ flexDirection: "row"}}>
+                  {/* Play Button */}
+                  <TouchableOpacity
+                           onPress={() => {
+                               router.push({
+                                 pathname: `/Watch/${featuredSeries?.id}`,
+                                 params: { type: "tv" },
+                               });
+                             }
+                           }
+                    style={{
+                      flexDirection: "row",
+                      alignItems: "center",
+                      backgroundColor: "#fff",
+                      paddingVertical: 12,
+                      paddingHorizontal: 24,
+                      borderRadius: 8,
+                      shadowColor: "#000",
+                      shadowOffset: { width: 0, height: 5 },
+                      shadowOpacity: 0.3,
+                      shadowRadius: 10,
+                       marginRight: 12,
+                    }}
+                  >
+                    <Ionicons name="play" size={20} color="#000" />
+                    <Text style={{ color: "#000", fontWeight: "bold", marginLeft: 8, fontSize: 16 }}>
+                      Play
+                    </Text>
+                  </TouchableOpacity>
+          
+                  <TouchableOpacity
+                     onPress={() => {
                               if (!featuredSeries?.id) return;
                               router.push({
                                 pathname: `/movies/[id]`,
@@ -247,47 +260,36 @@ export default function SeriesOnly() {
                               });
                             }
                           }
-                  
+                    style={{
+                      flexDirection: "row",
+                      alignItems: "center",
+                      paddingVertical: 12,
+                      paddingHorizontal: 20,
+                      borderRadius: 8,
+                      backgroundColor: "rgba(255,255,255,0.85)",
+                    }}
+                  >
+                    <View
                       style={{
-                        flexDirection: "row",
+                        width: 28,
+                        height: 28,
+                        borderRadius: 14,
+                        backgroundColor: "#fff",
                         alignItems: "center",
-                        paddingVertical: 10,
-                        paddingHorizontal: 16,
-                        borderRadius: 8,
-                        backgroundColor: "#e5e5e5", 
-                        height:40
+                        justifyContent: "center",
+                        marginRight: 8,
                       }}
                     >
-                      {/* Icon Circle */}
-                      <View
-                        style={{
-                          width: 28,
-                          height: 28,
-                          borderRadius: 14,
-                          backgroundColor: "#fff", 
-                          alignItems: "center",
-                          justifyContent: "center",
-                          marginRight: 8,
-                        }}
-                      >
-                        <Ionicons name="information" size={20} color="#000" />
-                      </View>
-                  
-                      <Text
-                        style={{
-                          color: "#000",
-                          fontWeight: "500",
-                          fontSize:15
-                        }}
-                      >
-                        More info
-                      </Text>
-                      </TouchableOpacity>
-                  
-                 
-                 
+                      <Ionicons name="information" size={20} color="#000" />
+                    </View>
+                    <Text style={{ color: "#000", fontWeight: "500", fontSize: 16 }}>
+                      More Info
+                    </Text>
+                  </TouchableOpacity>
                 </View>
               </View>
+          
+             
             </View>
           )}
 
@@ -313,7 +315,6 @@ export default function SeriesOnly() {
 
 
             <View style={{ flex:1}}>
-              {/* Latest TV */}
               <Text style={{ color: "#fff", margin: 10, marginTop: 20,  fontSize:20 }}>
                 Latest  Series
               </Text>
@@ -332,7 +333,6 @@ export default function SeriesOnly() {
           
             </View>
 
-          {/* Popular Series */}
             <View style={{ flex:1}}>
               <Text style={{ color: "#fff", margin: 10, marginTop: 20,  fontSize:20 }}>
                 Popular Series
